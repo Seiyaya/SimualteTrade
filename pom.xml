@@ -74,6 +74,7 @@
 		</plugins>
 	</build>
 	<modules>
-		<module>com.seiyaya.common</module>
+		<module>../common-component</module>
+		<module>../common-trade</module>
 	</modules>
 </project>
