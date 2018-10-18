@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %l - %msg%n"/>
+    </Console>
+    
+    <RollingRandomAccessFile name="simulate-bus-info" fileName="logs/simulate-info.log"   filePattern="logs/$${date:yyyy-MM}/simulate-info-%d{yyyy-MM-dd}-%i.log">
+        <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %l - %msg%n"/>        
+        <Policies>
+            <!--  -->
+         	<TimeBasedTriggeringPolicy interval="1" />  
+         	<!-- 日志的最大容量 -->
+            <SizeBasedTriggeringPolicy size="5 MB" />  
+        </Policies>
+        <Filters>
+               <!-- <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/> -->
+              <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Filters>
+        <!-- 最大保留多少个日志文件 -->
+        <DefaultRolloverStrategy max="20" /> 
+    </RollingRandomAccessFile>
+    <RollingRandomAccessFile name="simulate-bus-error" fileName="logs/simulate-error.log"   filePattern="logs/$${date:yyyy-MM}/simulate-error-%d{yyyy-MM-dd}-%i.log">
+        <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %l - %msg%n"/>
+        <Policies>
+            <!--  -->
+         	<TimeBasedTriggeringPolicy interval="1" />  
+         	<!-- 日志的最大容量 -->
+            <SizeBasedTriggeringPolicy size="5 MB" />  
+        </Policies>
+        <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+        <!-- 最大保留多少个日志文件 -->
+        <DefaultRolloverStrategy max="20" /> 
+    </RollingRandomAccessFile>
+    <!-- engine-bus-info采取异步输出 -->
+  </Appenders>
+  <Loggers>
+    <!-- 如果Root不进行配置 -->
+    <AsyncRoot level="info">
+      <AppenderRef ref="console"/>
+      <AppenderRef ref="simulate-bus-error"></AppenderRef>
+      <AppenderRef ref="simulate-bus-info"></AppenderRef>
+    </AsyncRoot>
+  </Loggers>
+</Configuration>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seiyaya.stock.mapper.StockMapper">
+	<!-- 实体和数据库映射关系 -->
+	<resultMap type="Stock" id="stock">
+		<result property="stockCode" column="stock_code"></result>
+        <result property="marketId" column="market_id"></result>
+        <result property="nowPrice" column="now_price"></result>
+        <result property="dayPercentage" column="day_percentage"></result>
+        <result property="tradeDate" column="trade_date"></result>
+        <result property="remark" column="remark"/>
+        <result property="stockName" column="stock_name"/>
+	</resultMap>
+	
+	<insert id="insertStockInfoList" parameterType="java.util.List">
+		<foreach collection="list" separator=";" item="cus">
+			insert into t_sim_hist_stock( 
+			 market_id, 
+			 stock_code, 
+			 trade_date, 
+			 stock_name, 
+			 now_price, 
+			 day_percentage, 
+			 remark
+			) values (
+			 #{cus.marketId},
+			 #{cus.stockCode},
+			 #{cus.tradeDate},
+			 #{cus.stockName},
+			 #{cus.nowPrice},
+			 #{cus.dayPercentage},
+			 #{cus.remark}
+			 )
+			 on duplicate key update now_price = #{cus.nowPrice},day_percentage = #{cus.dayPercentage},stock_name =  #{cus.stockName},remark=#{cus.remark}
+		</foreach>
+	</insert>
+</mapper>
