@@ -14,6 +14,16 @@ public class SystemConfig {
 	
 	public static final String SETTLE_FLAG = "settle_flag";
 	
+	public static final String EXPONENT_LIST = "exponeny_list";
+	
+	public static final String HQ_URL = "hq_url";
+	
+	public static final String HQ_STOCK_TYPE = "hq_stock_type";
+	
+	public static final String HQ_ENCODING = "hq_encoding";
+	
+	public static final String HQ_FUNCTION = "hq_function";
+	
 	private String name;
 	private String key;
 	private String value;

@@ -5,7 +5,6 @@ import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpStatus;
@@ -23,7 +22,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
-import org.springframework.stereotype.Component;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +34,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Data
 @Slf4j
-@Component
 public class HttpUtils {
 
 	private static final String ENCODING = "UTF-8";
 
 	private PoolingHttpClientConnectionManager cm = null;
 
-	@PostConstruct
+	private static HttpUtils httpUtils = new HttpUtils();
+	
+	private HttpUtils() {
+		init();
+	}
+	
+	public static HttpUtils getHttpUtils() {
+		return httpUtils;
+	}
+	
 	public void init() {
 		log.info("初始化httpUtils");
 		LayeredConnectionSocketFactory sslsf = null;
@@ -117,5 +123,11 @@ public class HttpUtils {
 	public String getElementText(String url, Map<String, Object> params, String className) {
 		String result = sendGet(url, params, ENCODING);
 		return Jsoup.parse(result).getElementsByClass(className).get(0).text();
+	}
+	
+	public static void main(String[] args) {
+		System.getProperties().keySet().forEach((key)->{
+			log.info("{} --> {}",key,System.getProperties().get(key));
+		});;
 	}
 }

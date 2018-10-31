@@ -1,4 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seiyaya.stock.mapper.SystemConfigMapper">
+	
+	<resultMap type="SystemConfig" id="sysconfig">
+		<result property="key" column="key"></result>
+        <result property="value" column="value"></result>
+        <result property="name" column="name"></result>
+        <result property="description" column="description"></result>
+        <result property="type" column="type"></result>
+        <result property="createDate" column="create_date"/>
+	</resultMap>
+	
+	<select id="querySystemConfigList" resultType="SystemConfig">
+		select * from t_sim_sys_config
+	</select>
+	
+	<select id="queryHolidayList" resultType="String">
+		select t_date from t_sim_trade_date where is_trade =  '0'
+	</select>
+	
+	<insert id="batchAddIndustry" parameterType="Industry">
+		<foreach collection="list" separator=";" item="industry">
+			insert into t_sim_industry( 
+			 market_id, 
+			 stock_code, 
+			 industry_code, 
+			 industry_name
+			) values (
+			 #{industry.marketId},
+			 #{industry.stockCode},
+			 #{industry.industryCode},
+			 #{industry.industryName}
+			)
+		</foreach>
+	</insert>
+	
+	<delete id="deleteIndustry">
+		delete from t_sim_industry
+	</delete>
+	
+	<insert id="batchAddExponent" parameterType="Stock">
+		<foreach collection="list" separator=";" item="stock">
+			insert into t_sim_exponent( 
+			 market_id, 
+			 stock_code, 
+			 stock_name,
+			 exponent,
+			 create_date,
+			 exponent_dynamic,
+			 yesterday
+			) values (
+			 #{stock.marketId},
+			 #{stock.stockCode},
+			 #{stock.stockName},
+			 #{stock.nowPrice},
+			 DATE_FORMAT(NOW(),'%Y%m%d'),
+			 #{stock.dayPercentage},
+			 #{stock.yesterday}
+			)
+			 on duplicate key update exponent = #{stock.nowPrice},exponent_dynamic =  #{stock.dayPercentage}
+		</foreach>
+	</insert>
 </mapper>

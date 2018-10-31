@@ -53,7 +53,7 @@ public class DateUtils {
 	}
 
 	public static String formatNowDate() {
-		return formatNowDate(PATTERN_DATE);
+		return formatNowDate(NO_PATTERN_DATE);
 	}
 
 	/**

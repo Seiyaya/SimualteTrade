@@ -19,6 +19,11 @@ public interface StockCacheService {
 	 */
 	public void initStockCache();
 
+	/**
+	 * 根据key获取股票信息
+	 * @param key
+	 * @return
+	 */
 	public Stock getStockByKey(String key);
 
 	/**
@@ -29,9 +34,32 @@ public interface StockCacheService {
 	public boolean isTradeDate(String nowDate);
 
 	/**
+	 * 今天是否是交易日
+	 * @return
+	 */
+	public boolean isTradeDate();
+	
+	/**
 	 * 获取交易的手续费
 	 * @param commission
 	 * @return
 	 */
 	public double getTradeFare(String commission);
+	
+	/**
+	 * 获取系统配置
+	 * @param key
+	 * @return
+	 */
+	public String getSysConfig(String key);
+
+	/**
+	 * 下载行业数据并入库
+	 */
+	public void downloadIndustryInfo();
+
+	/**
+	 * 下载指数信息入库
+	 */
+	public void downloadExponentInfo();
 }

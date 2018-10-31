@@ -1,32 +1,27 @@
 package com.seiyaya.common.http;
 
-import java.util.HashMap;
-
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.seiyaya.common.bean.SystemConfig;
+import com.seiyaya.stock.service.StockCacheService;
 
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class TestHttpUtils {
 	
-	public static final String URL = "https://fund.xueqiu.com/dj/open/fund/growth/161725";
+	@Autowired
+	StockCacheService stockCacheService;
 	
 	@Test
 	public void testUse() {
-		val params = new HashMap<String,Object>();
-		params.put("day", "360");
-		HttpUtils httpUtils = new HttpUtils();
-		String sendGet = httpUtils.sendGet(URL, params);
-		JSONArray jsonArray = JSONObject.parseObject(sendGet).getJSONObject("data").getJSONArray("fund_nav_growth");
-		jsonArray.forEach((json) -> {
-			if(json instanceof JSONObject) {
-				JSONObject innerJsonObject = (JSONObject) json;
-				log.info("info->{}",innerJsonObject);
-			}
-		});
+		log.info("{}",stockCacheService.getStockByKey(SystemConfig.SETTLE_FLAG));
+		stockCacheService.downloadExponentInfo();
 	}
 }

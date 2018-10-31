@@ -2,6 +2,7 @@ package com.seiyaya.common.http;
 
 import java.util.List;
 
+import com.seiyaya.common.bean.Industry;
 import com.seiyaya.common.bean.Stock;
 
 /**
@@ -12,22 +13,21 @@ import com.seiyaya.common.bean.Stock;
 public interface HQUtils {
 	
 	/**
-	 * 根据类型获取股票信息
-	 * @param type
-	 * @return
-	 */
-	public List<Stock> getStockInfoListByType(String type);
-	
-	/**
 	 * 获取股票信息列表
 	 * @return
 	 */
 	public List<Stock> getStockInfoList();
-	
+
 	/**
-	 * 获取近一年的基金信息
-	 * @param stockCode
+	 * 下载行业数据
 	 * @return
 	 */
-	public List<Stock> getFundInfo(String stockCode);
+	public List<Industry> getIndustryList();
+
+	/**
+	 * 根据marketId1:stockCode1|marketId2:stockCode2获取股票信息
+	 * @param exponentList
+	 * @return
+	 */
+	public List<Stock> getStockInfo(String exponentList);
 }
