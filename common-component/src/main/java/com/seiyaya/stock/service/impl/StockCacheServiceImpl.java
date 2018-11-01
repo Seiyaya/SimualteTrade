@@ -14,12 +14,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.seiyaya.common.bean.DBParam;
+import com.seiyaya.common.bean.HQStatus;
 import com.seiyaya.common.bean.Industry;
 import com.seiyaya.common.bean.Stock;
 import com.seiyaya.common.bean.SystemConfig;
 import com.seiyaya.common.http.CompanyHQUtils;
 import com.seiyaya.common.http.HQUtils;
+import com.seiyaya.common.http.InformationDownload;
 import com.seiyaya.common.utils.DateUtils;
+import com.seiyaya.stock.mapper.StockMapper;
 import com.seiyaya.stock.mapper.SystemConfigMapper;
 import com.seiyaya.stock.service.StockCacheService;
 
@@ -31,12 +35,15 @@ import lombok.extern.slf4j.Slf4j;
  * @author Seiyaya
  *
  */
-@Service
+@Service(value = StockCacheService.BEAN_NAME)
 @Slf4j
 public class StockCacheServiceImpl implements StockCacheService {
 	
 	@Autowired
 	private SystemConfigMapper systemConfigMapper;
+	
+	@Autowired
+	private StockMapper stockMapper;
 	
 	private HQUtils hqUtils;
 	
@@ -52,6 +59,11 @@ public class StockCacheServiceImpl implements StockCacheService {
 	//股票信息
 	private static List<Stock>   stockKeyList = new ArrayList<>();
 
+	@Override
+	public List<Stock> getStockKeyList() {
+		return stockKeyList;
+	}
+	
 	@Override
 	@PostConstruct
 	public void initConfigCache() {
@@ -154,5 +166,44 @@ public class StockCacheServiceImpl implements StockCacheService {
 		log.info("采集的指数信息:{}",exponentList);
 		List<Stock> stockList = hqUtils.getStockInfo(exponentList);
 		systemConfigMapper.batchAddExponent(stockList);
+	}
+
+	@Override
+	public boolean isInitSuccess() {
+		HQStatus status = hqUtils.getStatus();
+		String date = DateUtils.formatNowDate();
+		if(!date.equals(status.getHqInitDate()) && !isTradeDate(date)) {
+			log.error("行情为初始化，上次初始化的日期:{}",status.getHqInitDate());
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void addStockToDb(List<Stock> stockKeyList) {
+		String date = DateUtils.formatNowDate();
+		int num = stockMapper.getStockInfoNum(date);
+		if(num <= 0) {
+			log.info("{}日初始化，股票信息初始化大小:{}",date,stockKeyList.size());
+			stockMapper.deleteStockInfo();
+			stockMapper.insertStockInfoList(stockKeyList);
+		}else {
+			log.info("{}已经初始化过，不用再初始化",date);
+		}
+	}
+
+	@Override
+	public void downloadCurrentBonus(String downloadDate, String today) {
+		int count = DateUtils.getDaysByTwoDate(downloadDate,today);
+		while(count >= 0) {
+			String down = DateUtils.getNDate(downloadDate, -1);
+			log.error(down);
+			InformationDownload.checkBonusUrl(down);
+			count--;
+		}
+	}
+
+	@Override
+	public void downloadHistBonusData(String firstdayByMonth, String downloadDate) {
 	}
 }

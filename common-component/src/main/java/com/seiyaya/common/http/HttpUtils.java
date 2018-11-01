@@ -71,6 +71,39 @@ public class HttpUtils {
 		return httpClient;
 	}
 
+	public byte[] sendGetByte(String url) {
+		log.info("请求方式->get 请求的url->{}", url);
+		CloseableHttpClient client = getHttpClient();
+		CloseableHttpResponse response = null;
+		HttpGet httpGet = new HttpGet();
+		try {
+			URIBuilder builder = new URIBuilder(url);
+			URI uri = builder.build();
+			httpGet.setURI(uri);
+			log.info("real url ->{}",httpGet.getURI().toString());
+			response = client.execute(httpGet);
+			int status = response.getStatusLine().getStatusCode();
+			if (status == HttpStatus.SC_OK) {
+				return EntityUtils.toByteArray(response.getEntity());
+			} else {
+				log.error("响应失败，状态码：" + status);
+			}
+		} catch (Exception e) {
+			log.error("发送get请求失败", e);
+			throw new RuntimeException(e);
+		} finally {
+			httpGet.releaseConnection();
+			if(response!=null) {
+				try {
+					response.close();
+				} catch (IOException e) {
+					log.error("",e);
+				}
+			}
+		}
+		return null;
+	}
+	
 	public String sendGet(String url) {
 		return sendGet(url, null, ENCODING);
 	}
@@ -85,8 +118,6 @@ public class HttpUtils {
 		CloseableHttpClient client = getHttpClient();
 		CloseableHttpResponse response = null;
 		HttpGet httpGet = new HttpGet();
-		httpGet.addHeader("Cookie",
-				"xq_a_token=bb7610f538b447ebadd6a374cdff374206f350dd; xq_a_token.sig=XglA1uiAYkfyfKlhbuJdRhRTTM4; xq_r_token=c946fa437eff0f7b251c2a7babd12b5c9e5a1851; xq_r_token.sig=jW7KrLgtGYffUvfG3DfPexDR8RQ; _ga=GA1.2.1133658.1538990044; _gid=GA1.2.1240074852.1538990044; Hm_lvt_1db88642e346389874251b5a1eded6e3=1538990044; u=671538990045610; device_id=561e497c5e923875a0be9767d38b4637; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1538990057");
 		try {
 			URIBuilder builder = new URIBuilder(url);
 			if (params != null) {

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 
 /**
@@ -102,5 +103,22 @@ public class DateUtils {
 		int minute = now.get(Calendar.MINUTE);
 		int minutes = hour * 60 + minute; //
 		return minutes >= CLOSE_TIME || minutes < OPEN_BEFORE;
+	}
+	
+	/**
+	 * 获取指定日期第一天
+	 * @param date
+	 * @return
+	 */
+	public static String getFirstdayByMonth(Date date) {
+		String dayOfMonth = new DateTime(date).dayOfMonth().withMinimumValue().toString(NO_PATTERN_DATE);
+		return dayOfMonth;
+	}
+
+	public static int getDaysByTwoDate(String downloadDate, String today) {
+		DateTime dateTime1 = DateTime.parse(downloadDate, DateTimeFormat.forPattern(NO_PATTERN_DATE));
+		DateTime dateTime2 = DateTime.parse(today, DateTimeFormat.forPattern(NO_PATTERN_DATE));
+		int days = Days.daysBetween(dateTime1, dateTime2).getDays();
+		return Math.abs(days);
 	}
 }

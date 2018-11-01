@@ -24,6 +24,10 @@ public class SystemConfig {
 	
 	public static final String HQ_FUNCTION = "hq_function";
 	
+	public static final String BONUS_LAST_DATE = "bonus_last_date";
+	
+	public static final String BONUS_DOWNLOAD_URL = "bonus_download_url";
+	
 	private String name;
 	private String key;
 	private String value;

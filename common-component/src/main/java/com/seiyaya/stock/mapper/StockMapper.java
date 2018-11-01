@@ -10,4 +10,8 @@ import com.seiyaya.common.bean.Stock;
 public interface StockMapper {
 	
 	int insertStockInfoList(List<Stock> list);
+
+	int getStockInfoNum(String date);
+
+	void deleteStockInfo();
 }

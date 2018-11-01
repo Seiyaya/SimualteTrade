@@ -6,6 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.seiyaya.common.bean.DBParam;
+import com.seiyaya.common.bean.HQStatus;
 import com.seiyaya.common.bean.Industry;
 import com.seiyaya.common.bean.Stock;
 import com.seiyaya.common.bean.SystemConfig;
@@ -118,5 +119,21 @@ public class CompanyHQUtils implements HQUtils{
 			stockList.add(stock);
 		});
 		return stockList;
+	}
+
+	@Override
+	public HQStatus getStatus() {
+		DBParam params = new DBParam()
+				.set("version", "1")
+				.set("funcno", "29999");
+		String resultString = httpUtils.sendGet(hqUrl, params);
+		JSONArray array = JSONObject.parseObject(resultString).getJSONArray("results").getJSONArray(0);
+		HQStatus status = new HQStatus();
+		status.setStockNum(array.getIntValue(0));
+		status.setHqInitDate(array.getString(1));
+		status.setDbfTime(array.getString(2));
+		status.setHqServerTime(array.getString(3));
+		status.setHkHQTime(array.getString(4));
+		return status;
 	}
 }

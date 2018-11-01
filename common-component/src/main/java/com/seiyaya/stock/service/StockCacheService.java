@@ -1,5 +1,7 @@
 package com.seiyaya.stock.service;
 
+import java.util.List;
+
 import com.seiyaya.common.bean.Stock;
 
 /**
@@ -8,6 +10,8 @@ import com.seiyaya.common.bean.Stock;
  *
  */
 public interface StockCacheService {
+	
+	public static final String BEAN_NAME = "common.commponent.StockCacheService";
 	
 	/**
 	 * 初始化基础数据
@@ -25,6 +29,12 @@ public interface StockCacheService {
 	 * @return
 	 */
 	public Stock getStockByKey(String key);
+	
+	/**
+	 * 获取股票信息泪飙
+	 * @return
+	 */
+	public List<Stock> getStockKeyList();
 
 	/**
 	 * 是否是交易日
@@ -62,4 +72,25 @@ public interface StockCacheService {
 	 * 下载指数信息入库
 	 */
 	public void downloadExponentInfo();
+
+	/**
+	 * 是否初始化成功
+	 * @return
+	 */
+	public boolean isInitSuccess();
+
+	/**
+	 * 添加股票信息到数据库
+	 * @param stockKeyList
+	 */
+	public void addStockToDb(List<Stock> stockKeyList);
+
+	/**
+	 *  当月分红数据下载
+	 * @param downloadDate
+	 * @param today
+	 */
+	public void downloadCurrentBonus(String downloadDate, String today);
+
+	public void downloadHistBonusData(String firstdayByMonth, String downloadDate);
 }

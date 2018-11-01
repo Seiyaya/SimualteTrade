@@ -17,9 +17,20 @@ public class StockTask {
 	 * 更新行情
 	 */
 	public void updateStockHQ() {
-		StockCacheService cacheService = SpringUtils.getBean("", StockCacheService.class);
+		StockCacheService cacheService = SpringUtils.getBean(StockCacheService.BEAN_NAME, StockCacheService.class);
 		log.info("======初始化行情 start======");
 		cacheService.initStockCache();
+		log.info("======初始化行情 end========");
+	}
+	
+	public void addStockDB() {
+		StockCacheService cacheService = SpringUtils.getBean(StockCacheService.BEAN_NAME, StockCacheService.class);
+		log.info("======初始化行情 start======");
+		cacheService.initStockCache();
+		if(!cacheService.isInitSuccess()) {
+			return ;
+		}
+		cacheService.addStockToDb(cacheService.getStockKeyList());
 		log.info("======初始化行情 end========");
 	}
 }

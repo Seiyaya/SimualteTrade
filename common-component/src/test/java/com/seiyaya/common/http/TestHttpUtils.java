@@ -23,5 +23,6 @@ public class TestHttpUtils {
 	public void testUse() {
 		log.info("{}",stockCacheService.getStockByKey(SystemConfig.SETTLE_FLAG));
 		stockCacheService.downloadExponentInfo();
+		stockCacheService.isInitSuccess();
 	}
 }

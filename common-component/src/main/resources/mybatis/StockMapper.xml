@@ -12,6 +12,14 @@
         <result property="stockName" column="stock_name"/>
 	</resultMap>
 	
+	<delete id="deleteStockInfo">
+		delete from t_sim_information
+	</delete>
+	
+	<select id="getStockInfoNum" parameterType="String" resultType="Integer">
+		select count(1) from t_sim_information where trade_date = #{date}
+	</select>
+	
 	<insert id="insertStockInfoList" parameterType="java.util.List">
 		<foreach collection="list" separator=";" item="cus">
 			insert into t_sim_hist_stock( 

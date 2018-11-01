@@ -2,6 +2,7 @@ package com.seiyaya.common.http;
 
 import java.util.List;
 
+import com.seiyaya.common.bean.HQStatus;
 import com.seiyaya.common.bean.Industry;
 import com.seiyaya.common.bean.Stock;
 
@@ -30,4 +31,10 @@ public interface HQUtils {
 	 * @return
 	 */
 	public List<Stock> getStockInfo(String exponentList);
+
+	/**
+	 * 获取行情的状态
+	 * @return
+	 */
+	public HQStatus getStatus();
 }
