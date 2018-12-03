@@ -2,9 +2,12 @@ package com.seiyaya.stock.trade.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.Order;
 
+@Mapper
 public interface OrderMapper {
 
 	/**

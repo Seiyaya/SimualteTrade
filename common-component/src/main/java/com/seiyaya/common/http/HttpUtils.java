@@ -62,7 +62,7 @@ public class HttpUtils {
 		Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
 				.register("https", sslsf).register("http", new PlainConnectionSocketFactory()).build();
 		cm = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-		cm.setMaxTotal(200);
+		cm.setMaxTotal(500);
 		cm.setDefaultMaxPerRoute(20);
 	}
 
@@ -83,7 +83,7 @@ public class HttpUtils {
 			log.info("real url ->{}",httpGet.getURI().toString());
 			response = client.execute(httpGet);
 			int status = response.getStatusLine().getStatusCode();
-			if (status == HttpStatus.SC_OK) {
+			if (status == HttpStatus.SC_OK || status == HttpStatus.SC_NOT_MODIFIED) {
 				return EntityUtils.toByteArray(response.getEntity());
 			} else {
 				log.error("响应失败，状态码：" + status);

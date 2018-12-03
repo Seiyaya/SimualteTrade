@@ -53,10 +53,14 @@ public class InformationDownload {
 	}
 
 	private static void getLoadFileData(String download) {
+		List<Map<String, Object>> bonusList = FileHelper.readText(System.getProperty("user.dir")+File.separator+"bonus"+File.separator+download+".txt");
+		if(bonusList != null && bonusList.size() > 0){
+			bonusDataList.addAll(bonusList);
+		}
 	}
 
 	private static void getLoadZipData(String download) {
-		List<Map<String, Object>> bonusList = FileHelper.readZip(System.getProperty("user.dir")+File.separator+"thinkiveBonus"+File.separator+download+".zip");
+		List<Map<String, Object>> bonusList = FileHelper.readZip(System.getProperty("user.dir")+File.separator+"bonus"+File.separator+download+".zip");
 		if(bonusList != null && bonusList.size() > 0){
 			bonusDataList.addAll(bonusList);
 		}

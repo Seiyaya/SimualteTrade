@@ -97,4 +97,25 @@ public class FileHelper {
 		return result;
 	}
 
+	/**
+	 * 读取文本
+	 * @param filePath
+	 * @return
+	 */
+	public static List<Map<String, Object>> readText(String filePath) {
+		File jsonfile = new File(filePath);
+		List<Map<String, Object>> resultlist = new ArrayList<Map<String, Object>>();
+		if (!jsonfile.exists()) {
+			return null;
+		}
+		try {
+			StringBuffer jsonStr = readJsonFile(new FileInputStream(jsonfile));
+			resultlist = getListFromJsonString(jsonStr.toString());
+		} catch (Exception e) {
+			log.error("读取文件出错：" + e);
+			return null;
+		}
+		return resultlist;
+	}
+
 }

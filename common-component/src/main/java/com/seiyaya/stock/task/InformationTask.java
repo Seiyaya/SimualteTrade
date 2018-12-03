@@ -41,6 +41,7 @@ public class InformationTask {
 	 * 下载分红数据
 	 */
 	public void updateBonus() {
+		log.info("======下载分红数据 start======");
 		String today = DateUtils.formatNowDate();
 		String downloadDate = cacheService.getSysConfig(SystemConfig.BONUS_LAST_DATE);
 		String downmonth = downloadDate.substring(0, 6);
@@ -56,5 +57,6 @@ public class InformationTask {
 			cacheService.downloadCurrentBonus(downloadDate,today);
 			cacheService.downloadHistBonusData(DateUtils.getFirstdayByMonth(new Date()),downloadDate);
 		}
+		log.info("======下载分红数据 end======");
 	}
 }

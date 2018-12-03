@@ -73,4 +73,7 @@ public class Order {
 		this.marketId = marketId;
 		this.stockCode = stockCode;
 	}
+	
+	public Order() {
+	}
 }

@@ -61,4 +61,8 @@
 			 on duplicate key update exponent = #{stock.nowPrice},exponent_dynamic =  #{stock.dayPercentage}
 		</foreach>
 	</insert>
+	
+	<select id="querySysConfigValue" parameterType="String" resultType="String">
+		select `value` from t_sim_sys_config where `key` = #{key}
+	</select>
 </mapper>

@@ -92,5 +92,10 @@ public interface StockCacheService {
 	 */
 	public void downloadCurrentBonus(String downloadDate, String today);
 
+	/**
+	 * 历史分红数据
+	 * @param firstdayByMonth
+	 * @param downloadDate
+	 */
 	public void downloadHistBonusData(String firstdayByMonth, String downloadDate);
 }

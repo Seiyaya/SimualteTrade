@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.DBPage;
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
-import com.seiyaya.stock.mapper.AccountMapper;
+import com.seiyaya.stock.trade.mapper.AccountMapper;
 import com.seiyaya.stock.trade.mapper.HoldStockMapper;
 import com.seiyaya.stock.trade.mapper.OrderMapper;
 import com.seiyaya.stock.trade.service.TradeService;
@@ -59,7 +58,7 @@ public class TradeServiceImpl implements TradeService {
 	@Override
 	public long addBuyOrder(Order order,Account account,String newVersion) {
 		String version = account.getVersion();
-		DBParam param = new DBParam().set("total_balance", order.getTotalBalance()).set("new_version", newVersion)
+		DBParam param = new DBParam().set("total_balance", -order.getTotalBalance()).set("new_version", newVersion)
 				.set("account_id", order.getAccountId()).set("version", version);
 		int flag = accountMapper.updateCurrentBalance(param);
 		if (flag == 1) {
@@ -72,7 +71,9 @@ public class TradeServiceImpl implements TradeService {
 
 	@Override
 	public Account queryAccount(int accountId) {
-		return accountMapper.queryAccount(new DBParam().set("account_id", accountId));
+		Account account = accountMapper.queryAccount(new DBParam().set("account_id", accountId));
+		log.info("查询到的账户信息:",account);
+		return account;
 	}
 
 	@Override
