@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.DBPage;
+import com.seiyaya.common.bean.FreeRate;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.common.bean.ResultBean;
@@ -43,7 +44,7 @@ public class OrderController {
 
 	@Autowired
 	private RuleService ruleService;
-
+	
 	@PostMapping("/add")
 	@ResponseBody
 	public ResultBean addOrder(Order order) {
@@ -52,10 +53,25 @@ public class OrderController {
 
 		Stock stock = stockCacheService.getStockByKey(order.getMarketId() + order.getStockCode());
 		checkCondition(stock == null, "未找到当天证券信息");
-		order.setOrderBalance(order.getOrderQty() * order.getOrderPrice());
 
-		//校验委托价格
+		//校验委托价格和参数添加
 		order.setOrderPrice(checkOrderPrice(order, stock));
+		order.setOrderBalance(order.getOrderQty() * order.getOrderPrice());
+		order.setOrderDate(DateUtils.formatNowDate());
+		order.setOrderTime(DateUtils.formatNowTime());
+		order.setStockName(stock.getStockName());
+		order.setTradeStatus("0");
+		order.setDealFlag("0");
+		order.setStockType(stock.getStockType());
+		
+		//手续费计算
+		FreeRate freeRate = new FreeRate(order);
+		order.setStapTax(freeRate.getStaptaxFree());
+		order.setCommission(freeRate.getCommissoinFree());
+		order.setTransferFare(freeRate.getTransferFree());
+		order.setTotalFare(freeRate.getTotalFare());
+		
+		order.setTotalBalance(order.calcTotalBalance());
 
 		String newVersion = UUID.randomUUID().toString();
 		long serialNum = -1L;
@@ -104,11 +120,9 @@ public class OrderController {
 		//买入规则校验
 		ruleService.compareTradeRule(order, stock);
 		Account account = tradeService.queryAccount(order.getAccountId());
-		double totalBalance = order.getOrderBalance()+order.getTotalFare();
-		order.setTotalBalance(totalBalance);
 		//交易账户校验
 		checkCondition(account==null, "交易账户不存在");
-		checkCondition(totalBalance> account.getCurrentBalance() || account.getCurrentBalance() <= 0, "可用资金不足");
+		checkCondition(order.getTotalBalance()> account.getCurrentBalance() || account.getCurrentBalance() <= 0, "可用资金不足");
 		long serialNum = tradeService.addBuyOrder(order,account,newVersion);
 		return serialNum;
 	}
@@ -168,6 +182,13 @@ public class OrderController {
 	@ResponseBody
 	public ResultBean queryTodayOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryTodayOrder(accountId,pageIndex,pageSize);
+		
+		list.getList().forEach((order) -> {
+			String tradeTypeName = stockCacheService.getEnumValue("trade_type",order.getTradeType());
+			order.setTradeTypeName(tradeTypeName);
+			String tradeStatusName = stockCacheService.getEnumValue("trade_status", order.getTradeStatus());
+			order.setTradeStatus(tradeStatusName);
+		});
 		ResultBean resultBean = new ResultBean();
 		resultBean.setResults("orders", list);
 		return resultBean;
@@ -177,6 +198,13 @@ public class OrderController {
 	@ResponseBody
 	public ResultBean queryHistOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryHistOrder(accountId,pageIndex,pageSize);
+		
+		list.getList().forEach((order) -> {
+			String tradeTypeName = stockCacheService.getEnumValue("trade_type",order.getTradeType());
+			order.setTradeTypeName(tradeTypeName);
+			String tradeStatusName = stockCacheService.getEnumValue("trade_status", order.getTradeStatus());
+			order.setTradeStatus(tradeStatusName);
+		});
 		ResultBean resultBean = new ResultBean();
 		resultBean.setResults("orders", list);
 		return resultBean;

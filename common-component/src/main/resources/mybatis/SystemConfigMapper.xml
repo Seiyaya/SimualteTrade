@@ -11,6 +11,12 @@
         <result property="createDate" column="create_date"/>
 	</resultMap>
 	
+	<resultMap type="Fare" id="fareBean">
+		<result property="stockType" column="stock_type"></result>
+        <result property="fareType" column="fare_type"></result>
+        <result property="fareValue" column="fare_value"></result>
+	</resultMap>
+	
 	<select id="querySystemConfigList" resultType="SystemConfig">
 		select * from t_sim_sys_config
 	</select>
@@ -64,5 +70,13 @@
 	
 	<select id="querySysConfigValue" parameterType="String" resultType="String">
 		select `value` from t_sim_sys_config where `key` = #{key}
+	</select>
+	
+	<select id="queryFareList" resultMap="fareBean">
+		select * from t_sim_fare
+	</select>
+	
+	<select id="queryEnumValue" resultType="DBParam">
+		select * from t_sim_enum
 	</select>
 </mapper>

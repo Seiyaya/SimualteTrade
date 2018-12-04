@@ -23,8 +23,6 @@ public interface OrderMapper {
 	 */
 	Order queryOrder(DBParam param);
 
-	List<Order> queryOrderList(DBParam param);
-
 	List<Order> queryHistOrderList(DBParam param);
 
 	List<Order> queryTodayOrderList(DBParam param);

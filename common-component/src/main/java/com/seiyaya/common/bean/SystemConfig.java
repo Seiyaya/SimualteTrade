@@ -28,6 +28,14 @@ public class SystemConfig {
 	
 	public static final String BONUS_DOWNLOAD_URL = "bonus_download_url";
 	
+	//费率相关
+	public static final String MIN_COMMISSION = "min_commission";
+	public static final String MIN_TRANSFER = "min_transfer";
+	public static final String DEFAULT_COMMISSION = "default_commission";
+	public static final String DEFAULT_STAPTAX = "default_staptax";
+	public static final String DEFAULT_TRANSFER_FREE = "default_transfer_free";
+	
+	
 	private String name;
 	private String key;
 	private String value;

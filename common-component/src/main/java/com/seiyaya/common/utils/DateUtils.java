@@ -121,4 +121,14 @@ public class DateUtils {
 		int days = Days.daysBetween(dateTime1, dateTime2).getDays();
 		return Math.abs(days);
 	}
+
+	public static String formatNowTime() {
+		return DateTime.now().toString("HH:mm");
+	}
+	
+	public static void main(String[] args) {
+		String formatNowTime = DateUtils.formatNowTime();
+		
+		System.out.println();
+	}
 }

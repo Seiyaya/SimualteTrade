@@ -33,6 +33,15 @@ public class Order {
 	private double commission = 0;
 	private double totalFare = 0;
 	private String orderType = LIMITPRICE;
+	private String tradeStatus;
+	private String dealFlag;
+	private int matchNo = 0;
+	private String stockType;
+	
+	
+	/**************非持久化属性*******************/
+	private String tradeTypeName;
+	private String tradeStatusName;
 	
 	public boolean isSell() {
 		return TRADE_TYPE_SELL.equals(tradeType);
@@ -50,11 +59,11 @@ public class Order {
 		return MARKETPRICE.equals(orderType);
 	}
 	
-	public double getTotalBalance(){
+	public double calcTotalBalance(){
 		if(isBuy()) {
-			return totalBalance + totalFare;
+			return orderBalance + totalFare;
 		}else if(isSell()) {
-			return totalBalance - totalFare;
+			return orderBalance - totalFare;
 		}
 		return 0;
 	}

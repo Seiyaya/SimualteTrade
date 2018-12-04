@@ -12,7 +12,7 @@ public class Account {
 	
 	public static final String IS_VALID = "1";
 	
-	private int accountId;
+	private Integer accountId;
 	private String accountName;
 	private String accountType;
 	private String userId;
@@ -22,8 +22,8 @@ public class Account {
 	private double freezedBalance;
 	private double totalAssets;
 	private double totalMarket;
-	private double createDate;
-	private double updateDate;
+	private String createDate;
+	private String updateDate;
 	private String remark;
 	private String state;
 	private String version;

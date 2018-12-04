@@ -14,4 +14,8 @@ public class DBParam extends HashMap<String, Object> {
 		put(key, value);
 		return this;
 	}
+	
+	public String getString(String key) {
+		return get(key).toString();
+	}
 }

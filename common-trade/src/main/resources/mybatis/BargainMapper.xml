@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seiyaya.stock.trade.mapper.BargainMapper">
+	<!-- 实体和数据库映射关系 -->
+	<resultMap type="Bargain" id="bargainBean">
+		<result property="bargainId" column="bargain_id"/>
+		<result property="accountId"  column="account_id"/>
+		<result property="orderId"  column="order_id"/>
+		<result property="execDate"  column="exec_date"/>
+        <result property="execTime"  column="exec_time"/>
+        <result property="marketId"  column="market_id"/>
+        <result property="stockCode"  column="stock_code"/>
+        <result property="stockName"  column="stock_name"/>
+        <result property="tradeType"  column="trade_type"/>
+        <result property="execQty"  column="exec_qty"/>
+        <result property="execPrice"  column="exec_price"/>
+        <result property="orderBalance"  column="order_balance"/>
+        <result property="stapTax"  column="stap_tax"/>
+        <result property="transferFare"  column="transfer_fare"/>
+        <result property="commission"  column="commission"/>
+        <result property="fare"  column="fare"/>
+        <result property="totalFare"  column="total_fare"/>
+        <result property="totalBalance"  column="total_balance"/>
+        <result property="remark" column="remark"/>
+        <result property="holdId"  column="hold_id"/>
+	</resultMap>
+	
+	<select id="queryTodayBargainList" parameterType="HashMap" resultMap="bargainBean">
+		select * from t_sim_bargain 
+		<where>
+			account_id = #{account_id}
+		</where>
+	</select>
+	
+	<select id="queryHistBargainList" parameterType="HashMap" resultMap="bargainBean">
+		select * from t_sim_hist_bargain where account_id = #{account_id}
+	</select>
+</mapper>

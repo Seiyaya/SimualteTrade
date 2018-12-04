@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.seiyaya.common.bean.DBParam;
+import com.seiyaya.common.bean.Fare;
+import com.seiyaya.common.bean.FreeRate;
 import com.seiyaya.common.bean.HQStatus;
 import com.seiyaya.common.bean.Industry;
 import com.seiyaya.common.bean.Stock;
@@ -53,11 +55,20 @@ public class StockCacheServiceImpl implements StockCacheService {
 	//系统配置
 	private static Map<String, String> defaultConfig = new HashMap<>();
 	
-	//股票信息
+	//费率信息
+	private static Map<String,Double> fareConfig = new HashMap<>();
+	
+	//股票信息, market_id+stock_code为key   直接从行情获取
 	private static Map<String,Stock>    stockKeyMap  = new ConcurrentHashMap<>();
+	
+	//数据库的股票信息  直接从数据库获取 key是stock_code
+	private static Map<String,Stock>    stockCodeMap  = new ConcurrentHashMap<>();
 	
 	//股票信息
 	private static List<Stock>   stockKeyList = new ArrayList<>();
+	
+	//数据字典项   trade_type:{0:证券买入,1:证券卖出}
+	private static Map<String,Map<String,String>> enumValue = new HashMap<>();
 
 	@Override
 	public List<Stock> getStockKeyList() {
@@ -71,8 +82,67 @@ public class StockCacheServiceImpl implements StockCacheService {
 		initHolidayCache();
 		hqUtils = new CompanyHQUtils(defaultConfig.get(SystemConfig.HQ_URL),this);
 		initStockCache();
+		initFareCache();
+		initEnumCache();
+		initDBStock();
 	}
 	
+	/**
+	 * 初始化数据库的股票信息到内存
+	 */
+	private void initDBStock() {
+		List<Stock> stockList = stockMapper.queryStockList();
+		Map<String,Stock> stockMap  = new ConcurrentHashMap<>();
+		if(stockList!=null && !stockList.isEmpty()) {
+			stockList.forEach((stock) -> {
+				stockMap.put(stock.getStockCode(), stock);
+			});
+			Map<String, Stock> tmp = stockCodeMap;
+			stockCodeMap = stockMap;
+			tmp.clear();
+		}else {
+			log.error("DB没有相应的股票信息");
+		}
+	}
+
+	/**
+	 * 初始化数据字典缓存
+	 */
+	private void initEnumCache() {
+		List<DBParam> list = systemConfigMapper.queryEnumValue();
+		if(list!=null && !list.isEmpty()) {
+			Map<String,Map<String,String>> parentMap = new HashMap<>();
+			list.forEach((param) -> {
+				Map<String, String> sonMap = parentMap.get(param.getString("enum_key"));
+				if(sonMap == null || sonMap.isEmpty()) {
+					sonMap = new HashMap<>();
+					sonMap.put(param.getString("item_value"), param.getString("item_name"));
+					parentMap.put(param.getString("enum_key"), sonMap);
+				}else {
+					sonMap.put(param.getString("item_value"), param.getString("item_name"));
+				}
+			});
+			Map<String, Map<String, String>> tmp = enumValue;
+			enumValue = parentMap;
+			tmp.clear();
+		}
+	}
+
+	/**
+	 * 初始化费率
+	 */
+	private void initFareCache() {
+		List<Fare> list = systemConfigMapper.queryFareList();
+		if(list!=null && !list.isEmpty()) {
+			log.info("费率配置项大小:",list.size());
+			list.forEach((fare) -> {
+				fareConfig.put(fare.getStockType()+":"+fare.getFareType(), fare.getFareValue());
+			});
+		}else {
+			log.info("未配置费率信息");
+		}
+	}
+
 	private void initHolidayCache() {
 		List<String> holidayList = systemConfigMapper.queryHolidayList();
 		if(holidayList!=null && !holidayList.isEmpty()) {
@@ -136,9 +206,26 @@ public class StockCacheServiceImpl implements StockCacheService {
 	}
 
 	@Override
-	public double getTradeFare(String commission) {
-		return Double.parseDouble(defaultConfig.get(commission));
+	public double getTradeFare(String commission,String fareType) {
+		Double commissionValue = fareConfig.get(commission);
+		if(commissionValue == null) {
+			if(FreeRate.COMMISSION.equals(fareType)) {
+				double value = Double.parseDouble(defaultConfig.get(SystemConfig.DEFAULT_COMMISSION));
+				return value;
+			}
+			
+			if(FreeRate.STAPTAX.equals(fareType)) {
+				return Double.parseDouble(defaultConfig.get(SystemConfig.DEFAULT_STAPTAX));
+			}
+			
+			if(FreeRate.TRANSFER_FREE.equals(fareType)) {
+				return Double.parseDouble(defaultConfig.get(SystemConfig.DEFAULT_TRANSFER_FREE));
+			}
+			return 0;
+		}
+		return commissionValue;
 	}
+
 
 	@Override
 	public String getSysConfig(String key) {
@@ -205,5 +292,21 @@ public class StockCacheServiceImpl implements StockCacheService {
 
 	@Override
 	public void downloadHistBonusData(String firstdayByMonth, String downloadDate) {
+	}
+
+	@Override
+	public String getEnumValue(String itemType, String itemValue) {
+		return enumValue.get(itemType).get(itemValue);
+	}
+
+	@Override
+	public Stock getStockByCode(String stockCode) {
+		return stockCodeMap.get(stockCode);
+	}
+
+	@Override
+	public Stock getStockFiveByKey(String marketId, String stockCode) {
+		//TODO:
+		return null;
 	}
 }

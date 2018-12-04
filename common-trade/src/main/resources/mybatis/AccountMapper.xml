@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seiyaya.stock.trade.mapper.AccountMapper">
 	<!-- 实体和数据库映射关系 -->
-	<resultMap type="Account" id="account">
+	<resultMap type="Account" id="accountBean">
 		<result property="accountId"  column="account_id"/>
         <result property="accountName"  column="account_name"/>
         <result property="accountType"  column="account_type"/>
@@ -20,7 +20,7 @@
         <result property="version"  column="version"/>
 	</resultMap>
 	
-	<select id="queryAccount" parameterType="HashMap" resultType="Account">
+	<select id="queryAccount" parameterType="HashMap" resultMap="accountBean">
 		select * from t_sim_account where account_id = #{account_id}
 	</select>
 	

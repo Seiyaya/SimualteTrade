@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
 import com.seiyaya.common.bean.Account;
+import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.DBPage;
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.stock.trade.mapper.AccountMapper;
+import com.seiyaya.stock.trade.mapper.BargainMapper;
 import com.seiyaya.stock.trade.mapper.HoldStockMapper;
 import com.seiyaya.stock.trade.mapper.OrderMapper;
 import com.seiyaya.stock.trade.service.TradeService;
@@ -30,6 +32,9 @@ public class TradeServiceImpl implements TradeService {
 
 	@Autowired
 	private HoldStockMapper holdStockMapper;
+	
+	@Autowired
+	private BargainMapper bargainMapper;
 
 	@Override
 	public long addSellOrder(Order order, HoldStock holdStock,String newVersion) {
@@ -100,8 +105,9 @@ public class TradeServiceImpl implements TradeService {
 	public DBPage<Order> queryCancelOrder(Integer accountId, int pageIndex, int pageSize) {
 		PageHelper.startPage(pageIndex, pageSize);
 		DBParam param = new DBParam()
-				.set("account_id", accountId);
-		List<Order> orderList = orderMapper.queryOrderList(param);
+				.set("account_id", accountId)
+				.set("cancel_status", "3");
+		List<Order> orderList = orderMapper.queryTodayOrderList(param);
 		DBPage<Order> result = new DBPage<>(orderList);
 		return result;
 	}
@@ -111,6 +117,36 @@ public class TradeServiceImpl implements TradeService {
 		DBParam param = new DBParam()
 				.set("order_id", orderId);
 		return orderMapper.queryOrder(param);
+	}
+
+	@Override
+	public DBPage<Bargain> queryTodayBargain(Integer accountId, int pageIndex, int pageSize) {
+		PageHelper.startPage(pageIndex, pageSize);
+		DBParam param = new DBParam()
+				.set("account_id", accountId);
+		List<Bargain> bargainList = bargainMapper.queryTodayBargainList(param);
+		DBPage<Bargain> result = new DBPage<>(bargainList);
+		return result;
+	}
+
+	@Override
+	public DBPage<Bargain> queryHistBargain(Integer accountId, int pageIndex, int pageSize) {
+		PageHelper.startPage(pageIndex, pageSize);
+		DBParam param = new DBParam()
+				.set("account_id", accountId);
+		List<Bargain> bargainList = bargainMapper.queryHistBargainList(param);
+		DBPage<Bargain> result = new DBPage<>(bargainList);
+		return result;
+	}
+
+	@Override
+	public DBPage<HoldStock> queryHoldStock(Integer accountId, int pageIndex, int pageSize) {
+		PageHelper.startPage(pageIndex, pageSize);
+		DBParam param = new DBParam()
+				.set("account_id", accountId);
+		List<HoldStock> holdStockList = holdStockMapper.queryHoldStockList(param);
+		DBPage<HoldStock> result = new DBPage<>(holdStockList);
+		return result;
 	}
 
 }

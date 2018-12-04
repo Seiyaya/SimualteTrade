@@ -54,7 +54,7 @@ public interface StockCacheService {
 	 * @param commission
 	 * @return
 	 */
-	public double getTradeFare(String commission);
+	public double getTradeFare(String commission,String fareType);
 	
 	/**
 	 * 获取系统配置
@@ -98,4 +98,27 @@ public interface StockCacheService {
 	 * @param downloadDate
 	 */
 	public void downloadHistBonusData(String firstdayByMonth, String downloadDate);
+
+	/**
+	 * 获取枚举值
+	 * @param itemType
+	 * @param itemValue
+	 * @return
+	 */
+	public String getEnumValue(String itemType, String itemValue);
+
+	/**
+	 * 根据股票代码获取股票信息，主要是可交易的
+	 * @param stockCode
+	 * @return
+	 */
+	public Stock getStockByCode(String stockCode);
+
+	/**
+	 * 获取五档信息
+	 * @param marketId
+	 * @param stockCode
+	 * @return
+	 */
+	public Stock getStockFiveByKey(String marketId, String stockCode);
 }

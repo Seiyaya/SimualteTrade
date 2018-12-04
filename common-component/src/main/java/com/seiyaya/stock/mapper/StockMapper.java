@@ -14,4 +14,6 @@ public interface StockMapper {
 	int getStockInfoNum(String date);
 
 	void deleteStockInfo();
+
+	List<Stock> queryStockList();
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seiyaya.stock.trade.mapper.OrderMapper">
+	<!-- 实体和数据库映射关系 -->
+	<resultMap type="Order" id="orderBean">
+		<result property="orderId"  column="order_id"/>
+        <result property="accountId"  column="account_id"/>
+        <result property="orderDate"  column="order_date"/>
+        <result property="orderTime"  column="order_time"/>
+        <result property="marketId"  column="market_id"/>
+        <result property="stockCode"  column="stock_code"/>
+        <result property="stockName"  column="stock_name"/>
+        <result property="tradeType"  column="trade_type"/>
+        <result property="tradeStatus"  column="trade_status"/>
+        <result property="orderQty"  column="order_qty"/>
+        <result property="orderPrice"  column="order_price"/>
+        <result property="orderBalance"  column="order_balance"/>
+        <result property="stapTax"  column="stap_tax"/>
+        <result property="fare"  column="fare"/>
+        <result property="transferFare"  column="transfer_fare"/>
+        <result property="commission"  column="commission"/>
+        <result property="totalFare"  column="total_fare"/>
+        <result property="totalBalance"  column="total_balance"/>
+        <result property="orderType"  column="order_type"/>
+        <result property="dealFlag"  column="deal_flag"/>
+        <result property="matchNo"  column="match_no"/>
+	</resultMap>
+	
+	
+	<insert id="addOrder" parameterType="Order">
+		 insert into t_sim_order( 
+			 account_id, 
+			 order_date, 
+			 order_time, 
+			 market_id, 
+			 stock_code, 
+			 stock_name, 
+			 trade_type, 
+			 trade_status, 
+			 order_qty, 
+			 order_price, 
+			 order_balance, 
+			 stap_tax, 
+			 fare, 
+			 transfer_fare, 
+			 commission, 
+			 total_fare, 
+			 total_balance, 
+			 order_type, 
+			 deal_flag, 
+			 match_no
+			) values (
+			 #{accountId},
+			 #{orderDate},
+			 #{orderTime},
+			 #{marketId},
+			 #{stockCode},
+			 #{stockName},
+			 #{tradeType},
+			 #{tradeStatus},
+			 #{orderQty},
+			 #{orderPrice},
+			 #{orderBalance},
+			 #{stapTax},
+			 #{fare},
+			 #{transferFare},
+			 #{commission},
+			 #{totalFare},
+			 #{totalBalance},
+			 #{orderType},
+			 #{dealFlag},
+			 #{matchNo}
+			 )
+	</insert>
+	
+	<select id="queryTodayOrderList" parameterType="HashMap" resultMap="orderBean">
+		select * from t_sim_order 
+		<where>
+			account_id = #{account_id}
+			<if test="cancel_status!=null and cancel_status!=''">and trade_status != 3 and deal_flag != 2</if>
+		</where>
+	</select>
+	
+	<select id="queryHistOrderList" parameterType="HashMap" resultMap="orderBean">
+		select * from t_sim_hist_order where account_id = #{account_id}
+	</select>
+</mapper>

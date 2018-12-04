@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seiyaya.stock.trade.mapper.HoldStockMapper">
+	<!-- 实体和数据库映射关系 -->
+	<resultMap type="HoldStock" id="holdStockBean">
+		<result property="holdId"  column="holdId"/>
+        <result property="accountId"  column="account_id"/>
+        <result property="marketId"  column="market_id"/>
+        <result property="stockCode"  column="stock_code"/>
+        <result property="totalQty"  column="total_qty"/>
+        <result property="currentQty"  column="current_qty"/>
+        <result property="costPrice"  column="cost_price"/>
+        <result property="holdPrice"  column="hold_price"/>
+        <result property="createDate"  column="create_date"/>
+        <result property="updateDate"  column="update_date"/>
+        <result property="remark"  column="remark"/>
+        <result property="version"  column="version"/>
+	</resultMap>
+	
+	<select id="queryHoldStock" parameterType="HashMap" resultMap="holdStockBean">
+		select * from t_sim_hold_stock
+		<where>
+			<if test="account_id != null and account_id !=''"> and account_id = #{account_id}</if>
+			<if test="stock_code != null and stock_code !=''"> and stock_code = #{stock_code}</if>
+			<if test="market_id != null and market_id !=''"> and market_id = #{market_id}</if>
+		</where>
+	</select>
+	
+	<update id="updateCurrentQty" parameterType="HashMap">
+		update t_sim_hold_stock set current_qty = current_qty - #{qty} ,version = #{new_version}
+		where account_id = #{account_id} and market_id =#{market_id} and stock_code = #{stock_code} and version =#{version}
+	</update>
+</mapper>
