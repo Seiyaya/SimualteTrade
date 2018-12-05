@@ -2,14 +2,11 @@ package com.seiyaya.common.bean;
 
 import java.util.HashMap;
 
-import lombok.Data;
-
 /**
  * 响应结果集 
  * @author Seiyaya
  *
  */
-@Data
 public class ResultBean {
 	
 	private String msg = "操作成功";
@@ -37,5 +34,31 @@ public class ResultBean {
 		this.results.put(key, value);
 		return this;
 	}
-	
+
+	public String getMsg() {
+		return msg;
+	}
+
+	public ResultBean setMsg(String msg) {
+		this.msg = msg;
+		return this;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public ResultBean setStatus(int status) {
+		this.status = status;
+		return this;
+	}
+
+	public HashMap<String, Object> getResults() {
+		return results;
+	}
+
+	public ResultBean setResults(HashMap<String, Object> results) {
+		this.results = results;
+		return this;
+	}
 }

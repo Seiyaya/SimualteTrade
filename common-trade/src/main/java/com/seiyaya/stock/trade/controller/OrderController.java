@@ -121,7 +121,6 @@ public class OrderController {
 		ruleService.compareTradeRule(order, stock);
 		Account account = tradeService.queryAccount(order.getAccountId());
 		//交易账户校验
-		checkCondition(account==null, "交易账户不存在");
 		checkCondition(order.getTotalBalance()> account.getCurrentBalance() || account.getCurrentBalance() <= 0, "可用资金不足");
 		long serialNum = tradeService.addBuyOrder(order,account,newVersion);
 		return serialNum;
@@ -178,7 +177,7 @@ public class OrderController {
 		return orderPrice;
 	}
 	
-	@GetMapping("/today/query")
+	@GetMapping("/query/today")
 	@ResponseBody
 	public ResultBean queryTodayOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryTodayOrder(accountId,pageIndex,pageSize);
@@ -194,7 +193,7 @@ public class OrderController {
 		return resultBean;
 	}
 	
-	@GetMapping("/hist/query")
+	@GetMapping("/query/hist")
 	@ResponseBody
 	public ResultBean queryHistOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryHistOrder(accountId,pageIndex,pageSize);
@@ -210,7 +209,7 @@ public class OrderController {
 		return resultBean;
 	}
 	
-	@GetMapping("/cancel/query")
+	@GetMapping("/query/cancel")
 	@ResponseBody
 	public ResultBean queryCancelOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryCancelOrder(accountId,pageIndex,pageSize);
@@ -219,7 +218,7 @@ public class OrderController {
 		return resultBean;
 	}
 	
-	@GetMapping("/cancel/add")
+	@PostMapping("/add/cancel")
 	@ResponseBody
 	public ResultBean queryCancelOrder(Integer accountId,Integer orderId){
 		Order order = tradeService.queryOrder(orderId);

@@ -12,6 +12,10 @@ import com.seiyaya.common.bean.DBPage;
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.bean.SystemConfig;
+import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
+import com.seiyaya.common.utils.DateUtils;
+import com.seiyaya.stock.service.StockCacheService;
 import com.seiyaya.stock.trade.mapper.AccountMapper;
 import com.seiyaya.stock.trade.mapper.BargainMapper;
 import com.seiyaya.stock.trade.mapper.HoldStockMapper;
@@ -35,6 +39,9 @@ public class TradeServiceImpl implements TradeService {
 	
 	@Autowired
 	private BargainMapper bargainMapper;
+	
+	@Autowired
+	private StockCacheService stockCacheService;
 
 	@Override
 	public long addSellOrder(Order order, HoldStock holdStock,String newVersion) {
@@ -78,6 +85,7 @@ public class TradeServiceImpl implements TradeService {
 	public Account queryAccount(int accountId) {
 		Account account = accountMapper.queryAccount(new DBParam().set("account_id", accountId));
 		log.info("查询到的账户信息:",account);
+		checkCondition(account == null, "账户信息不存在");
 		return account;
 	}
 
@@ -147,6 +155,47 @@ public class TradeServiceImpl implements TradeService {
 		List<HoldStock> holdStockList = holdStockMapper.queryHoldStockList(param);
 		DBPage<HoldStock> result = new DBPage<>(holdStockList);
 		return result;
+	}
+
+	@Override
+	public List<HoldStock> queryHoldStock(Integer accountId) {
+		DBParam param = new DBParam()
+				.set("account_id", accountId);
+		List<HoldStock> holdStockList = holdStockMapper.queryHoldStockList(param);
+		return holdStockList;
+	}
+
+	@Override
+	public Integer addAccount(Integer userId, String accountName) {
+		double initBalance = Double.parseDouble(stockCacheService.getSysConfig(SystemConfig.DEFAULT_INIT_BALANCE));
+		String date = DateUtils.formatNowDate(DateUtils.PATTERN_TIME);
+		
+		//添加普通账户
+		DBParam param = new DBParam()
+				.set("user_id", userId)
+				.set("account_name", accountName)
+				.set("init_balance", initBalance)
+				.set("total_assets", initBalance)
+				.set("current_balance", initBalance)
+				.set("create_date", date)
+				.set("update_date", date);
+		accountMapper.addAccount(param);
+		log.info("{}",param);
+		Integer accountId = param.getInt("account_id");
+		//添加资产中间表
+		param = new DBParam();
+		param.set("account_id", accountId).set("init_balance", initBalance)
+			.set("create_day", 1);
+		accountMapper.addAccountAssets(param);
+		
+		//添加账户指标
+		param = new DBParam().set("account_id", accountId);
+		accountMapper.addAccountIndicator(param);
+		
+		//添加收益指标
+		param = new DBParam().set("account_id", accountId);
+		accountMapper.addAccountEarn(param);
+		return accountId;
 	}
 
 }

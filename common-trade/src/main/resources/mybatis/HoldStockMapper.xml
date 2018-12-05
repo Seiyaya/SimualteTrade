@@ -26,6 +26,10 @@
 		</where>
 	</select>
 	
+	<select id="queryHoldStockList" parameterType="HashMap" resultMap="holdStockBean">
+		select * from t_sim_hold_stock
+	</select>
+	
 	<update id="updateCurrentQty" parameterType="HashMap">
 		update t_sim_hold_stock set current_qty = current_qty - #{qty} ,version = #{new_version}
 		where account_id = #{account_id} and market_id =#{market_id} and stock_code = #{stock_code} and version =#{version}

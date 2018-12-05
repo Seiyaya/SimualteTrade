@@ -1,5 +1,7 @@
 package com.seiyaya.stock.trade.service;
 
+import java.util.List;
+
 import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.DBPage;
@@ -106,4 +108,18 @@ public interface TradeService {
 	 * @return
 	 */
 	DBPage<HoldStock> queryHoldStock(Integer accountId, int pageIndex, int pageSize);
+	
+	/**
+	 * 查询账户持仓
+	 * @param accountId
+	 * @return
+	 */
+	List<HoldStock> queryHoldStock(Integer accountId);
+	/**
+	 * 创建账户
+	 * @param userId
+	 * @param accountName
+	 * @return
+	 */
+	Integer addAccount(Integer userId, String accountName);
 }

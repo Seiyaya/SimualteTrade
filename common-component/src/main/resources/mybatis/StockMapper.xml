@@ -13,23 +13,33 @@
 	</resultMap>
 	
 	<delete id="deleteStockInfo">
-		delete from t_sim_information
+		delete from t_sim_stock
 	</delete>
 	
 	<select id="getStockInfoNum" parameterType="String" resultType="Integer">
-		select count(1) from t_sim_information where trade_date = #{date}
+		select count(1) from t_sim_stock where trade_date = #{date}
+	</select>
+	
+	<select id="queryStockList" resultMap="stock">
+		select * from t_sim_stock
 	</select>
 	
 	<insert id="insertStockInfoList" parameterType="java.util.List">
 		<foreach collection="list" separator=";" item="cus">
-			insert into t_sim_hist_stock( 
+			insert into t_sim_stock( 
 			 market_id, 
 			 stock_code, 
 			 trade_date, 
 			 stock_name, 
 			 now_price, 
 			 day_percentage, 
-			 remark
+			 remark,
+			 sec_type,
+			 close_price,
+			 open_price,
+			 high_price,
+			 low_price,
+			 is_suspend
 			) values (
 			 #{cus.marketId},
 			 #{cus.stockCode},
@@ -37,9 +47,14 @@
 			 #{cus.stockName},
 			 #{cus.nowPrice},
 			 #{cus.dayPercentage},
-			 #{cus.remark}
+			 #{cus.remark},
+			 #{cus.stockType},
+			 #{cus.yesterday},
+			 #{cus.open},
+			 #{cus.high},
+			 #{cus.low},
+			 #{cus.issuspend}
 			 )
-			 on duplicate key update now_price = #{cus.nowPrice},day_percentage = #{cus.dayPercentage},stock_name =  #{cus.stockName},remark=#{cus.remark}
 		</foreach>
 	</insert>
 </mapper>

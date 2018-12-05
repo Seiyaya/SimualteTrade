@@ -273,6 +273,10 @@ public class StockCacheServiceImpl implements StockCacheService {
 		if(num <= 0) {
 			log.info("{}日初始化，股票信息初始化大小:{}",date,stockKeyList.size());
 			stockMapper.deleteStockInfo();
+			String now = DateUtils.formatNowDate();
+			stockKeyList.forEach((row) -> {
+				row.setTradeDate(now);
+			});
 			stockMapper.insertStockInfoList(stockKeyList);
 		}else {
 			log.info("{}已经初始化过，不用再初始化",date);

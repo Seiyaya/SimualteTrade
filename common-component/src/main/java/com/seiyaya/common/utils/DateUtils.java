@@ -125,10 +125,4 @@ public class DateUtils {
 	public static String formatNowTime() {
 		return DateTime.now().toString("HH:mm");
 	}
-	
-	public static void main(String[] args) {
-		String formatNowTime = DateUtils.formatNowTime();
-		
-		System.out.println();
-	}
 }

@@ -29,4 +29,38 @@
 		where account_id = #{account_id}
 			and version = #{version}
 	</update>
+	
+	<insert id="addAccount" parameterType="map" >
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="account_id">
+	          SELECT LAST_INSERT_ID()
+	      </selectKey>
+		insert into t_sim_account(
+			user_id,
+			account_name,
+			init_balance,
+			total_assets,
+			current_balance,
+			create_date,
+			update_date
+		) values (#{user_id},#{account_name},#{init_balance},#{total_assets},#{current_balance},#{create_date},#{update_date})
+	</insert>
+	
+	<insert id="addAccountAssets" parameterType="map">
+		insert into t_sim_account_tmp (account_id,
+			day_assets,
+			week_assets,
+			month_assets,
+			year_assets,
+			nearly_week_assets,
+			nearly_month_assets
+		) values (#{account_id},#{init_balance},#{init_balance},#{init_balance},#{init_balance},#{init_balance},#{init_balance})
+	</insert>
+	
+	<insert id="addAccountIndicator" parameterType="map">
+		insert into t_sim_account_indicator (account_id) values (#{account_id})
+	</insert>
+	
+	<insert id="addAccountEarn" parameterType="map">
+		insert into t_sim_account_earn (account_id) values (#{account_id})
+	</insert>
 </mapper>

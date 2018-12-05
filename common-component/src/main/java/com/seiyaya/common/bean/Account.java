@@ -28,6 +28,11 @@ public class Account {
 	private String state;
 	private String version;
 	
+	
+	/*************非持久化属性***************/
+	private double position;//总仓位
+	private double profitEarn;//浮动盈亏
+	
 	public boolean isValid() {
 		if(IS_VALID.equals(state)) {
 			return true;

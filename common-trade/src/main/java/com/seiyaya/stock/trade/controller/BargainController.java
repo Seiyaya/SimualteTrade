@@ -1,10 +1,10 @@
 package com.seiyaya.stock.trade.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.DBPage;
@@ -19,7 +19,7 @@ import com.seiyaya.stock.trade.service.TradeService;
  *
  */
 @RequestMapping("/bargain")
-@Controller
+@RestController
 public class BargainController {
 	
 	@Autowired

@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SystemConfig {
 	
+	public static String DEFAULT_INIT_BALANCE = "default_init_balance";
+
 	public static final String SETTLE_FLAG = "settle_flag";
 	
 	public static final String EXPONENT_LIST = "exponeny_list";

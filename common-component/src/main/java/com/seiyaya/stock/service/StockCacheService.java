@@ -31,7 +31,7 @@ public interface StockCacheService {
 	public Stock getStockByKey(String key);
 	
 	/**
-	 * 获取股票信息泪飙
+	 * 获取股票信息列表
 	 * @return
 	 */
 	public List<Stock> getStockKeyList();
