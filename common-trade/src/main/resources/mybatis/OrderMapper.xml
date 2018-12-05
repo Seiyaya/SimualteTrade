@@ -28,6 +28,9 @@
 	
 	
 	<insert id="addOrder" parameterType="Order">
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="orderId">
+	          SELECT LAST_INSERT_ID()
+	      </selectKey>
 		 insert into t_sim_order( 
 			 account_id, 
 			 order_date, 
@@ -81,7 +84,23 @@
 		</where>
 	</select>
 	
+	<select id="queryOrder" parameterType="HashMap" resultMap="orderBean">
+		select * from t_sim_order
+		where order_id = #{order_id} and account_id = #{account_id}
+	</select>
+	
 	<select id="queryHistOrderList" parameterType="HashMap" resultMap="orderBean">
 		select * from t_sim_hist_order where account_id = #{account_id}
 	</select>
+	
+	<update id="updateOrderDone" parameterType="map">
+		update t_sim_order set deal_flag='2',trade_status='4' where order_id=#{order_id}
+		and deal_flag != '2'
+	</update>
+	
+	<insert id="addCancelOrder" parameterType="map">
+		insert into t_sim_cancel_order
+		 (order_id,account_id,create_date,cancel_status,cancel_date)
+		 value (#{order_id},#{account_id},#{create_date},#{cancel_status},#{cancel_date})
+	</insert>
 </mapper>

@@ -8,7 +8,7 @@ import com.seiyaya.common.bean.DBParam;
 
 public class OrderControllerTest extends BaseTest{
 	
-	private String accountId  = "1";
+	private String accountId  = "6";
 	
 	@Test
 	@Rollback(true)
@@ -45,5 +45,11 @@ public class OrderControllerTest extends BaseTest{
 	public void queryCancelOrderList() throws Exception {
 		DBParam param = new DBParam().set("accountId", accountId);
 		invokeGet("/order/query/cancel", param);
+	}
+	
+	@Test
+	public void cancelOrder() {
+		DBParam param = new DBParam().set("accountId", "6").set("orderId", "12");
+		invokePost("/order/add/cancel", param);
 	}
 }

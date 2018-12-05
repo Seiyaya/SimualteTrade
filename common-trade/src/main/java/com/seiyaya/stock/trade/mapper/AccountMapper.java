@@ -46,5 +46,11 @@ public interface AccountMapper {
 	 * @param param
 	 */
 	void addAccountEarn(DBParam param);
+
+	/**
+	 * 更新账户
+	 * @param param
+	 */
+	void updateAccount(DBParam param);
 	
 }

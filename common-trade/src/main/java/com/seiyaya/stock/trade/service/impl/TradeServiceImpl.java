@@ -1,5 +1,7 @@
 package com.seiyaya.stock.trade.service.impl;
 
+import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.common.bean.SystemConfig;
-import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
 import com.seiyaya.common.utils.DateUtils;
 import com.seiyaya.stock.service.StockCacheService;
 import com.seiyaya.stock.trade.mapper.AccountMapper;
@@ -44,7 +45,7 @@ public class TradeServiceImpl implements TradeService {
 	private StockCacheService stockCacheService;
 
 	@Override
-	public long addSellOrder(Order order, HoldStock holdStock,String newVersion) {
+	public int addSellOrder(Order order, HoldStock holdStock,String newVersion) {
 		String version = holdStock.getVersion();
 		DBParam param = new DBParam().set("qty", order.getOrderQty()).set("new_version", newVersion)
 				.set("account_id", order.getAccountId()).set("version", version).set("market_id", order.getMarketId())
@@ -54,7 +55,7 @@ public class TradeServiceImpl implements TradeService {
 			return orderMapper.addOrder(order);
 		} else {
 			log.error("账户id为:{} 乐观锁失败! 委托信息:{}", order.getAccountId(), order);
-			return -1L;
+			return -1;
 		}
 	}
 
@@ -68,16 +69,17 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
-	public long addBuyOrder(Order order,Account account,String newVersion) {
+	public int addBuyOrder(Order order,Account account,String newVersion) {
 		String version = account.getVersion();
 		DBParam param = new DBParam().set("total_balance", -order.getTotalBalance()).set("new_version", newVersion)
 				.set("account_id", order.getAccountId()).set("version", version);
 		int flag = accountMapper.updateCurrentBalance(param);
 		if (flag == 1) {
-			return orderMapper.addOrder(order);
+			orderMapper.addOrder(order);
+			return order.getOrderId();
 		} else {
 			log.error("账户id为:{} 乐观锁失败! 委托信息:{}", order.getAccountId(), order);
-			return -1L;
+			return -1;
 		}
 	}
 
@@ -121,9 +123,10 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
-	public Order queryOrder(Integer orderId) {
+	public Order queryOrder(Integer accountId,Integer orderId) {
 		DBParam param = new DBParam()
-				.set("order_id", orderId);
+				.set("order_id", orderId)
+				.set("account_id", accountId);
 		return orderMapper.queryOrder(param);
 	}
 
@@ -196,6 +199,52 @@ public class TradeServiceImpl implements TradeService {
 		param = new DBParam().set("account_id", accountId);
 		accountMapper.addAccountEarn(param);
 		return accountId;
+	}
+
+	@Override
+	public void cancelOrder(Integer accountId, Integer orderId) {
+		DBParam cancelOrder = new DBParam()
+				.set("order_id", orderId)
+				.set("account_id", accountId)
+				.set("create_date", DateUtils.formatNowTime())
+				.set("cancel_status", "0")
+				.set("cancel_date", DateUtils.formatNowDate());
+		
+		DBParam updateOrder = new DBParam()
+				.set("order_id", orderId);
+		orderMapper.addCancelOrder(cancelOrder);
+		orderMapper.updateOrder(updateOrder);
+	}
+
+	@Override
+	public void outTimeCancelOrder(Integer accountId, Order order) {
+		if(order.isBuy()) {
+			//买入归还资金
+			DBParam param = new DBParam()
+					.set("total_balance", order.getTotalBalance())
+					.set("account_id", accountId);
+			accountMapper.updateAccount(param);
+		}else if(order.isSell()) {
+			//卖出归还持仓
+			DBParam param = new DBParam()
+					.set("total_qty", order.getOrderQty())
+					.set("stock_code", order.getStockCode())
+					.set("market_id", order.getMarketId())
+					.set("account_id", accountId);
+			holdStockMapper.updateHoldStock(param);
+		}
+		DBParam orderParam = new DBParam()
+				.set("order_id", order.getOrderId())
+				.set("total_qty",order.getOrderQty());
+		orderMapper.updateOrderDone(orderParam);
+		
+		DBParam cancelParam = new DBParam()
+				.set("order_id", order.getOrderId())
+				.set("account_id", order.getAccountId())
+				.set("create_date", DateUtils.formatNowTime())
+				.set("cancel_date", DateUtils.formatNowDate())
+				.set("cancel_status", "1");
+		orderMapper.addCancelOrder(cancelParam);
 	}
 
 }

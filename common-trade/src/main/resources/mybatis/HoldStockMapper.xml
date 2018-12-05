@@ -34,4 +34,9 @@
 		update t_sim_hold_stock set current_qty = current_qty - #{qty} ,version = #{new_version}
 		where account_id = #{account_id} and market_id =#{market_id} and stock_code = #{stock_code} and version =#{version}
 	</update>
+	
+	<update id="updateHoldStock" parameterType="HashMap">
+		update t_sim_hold_stock set current_qty = current_qty + #{total_qty} 
+			where account_id = #{account_id} and stock_code = #{stock_code} and market_id = #{market_id}
+	</update>
 </mapper>

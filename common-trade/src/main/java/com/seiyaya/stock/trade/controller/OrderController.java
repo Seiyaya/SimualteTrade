@@ -5,12 +5,11 @@ import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.DBPage;
@@ -28,7 +27,7 @@ import com.seiyaya.stock.trade.service.TradeService;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Controller
+@RestController
 @RequestMapping("/order")
 @Slf4j
 public class OrderController {
@@ -46,7 +45,6 @@ public class OrderController {
 	private RuleService ruleService;
 	
 	@PostMapping("/add")
-	@ResponseBody
 	public ResultBean addOrder(Order order) {
 		checkCondition(commonTradeService.isSettlementTime() && DateUtils.isSettlementTime(), "系统清算期间不能进行交易操作");
 		checkCondition(!order.validate(), "委托单参数不合法");
@@ -74,7 +72,7 @@ public class OrderController {
 		order.setTotalBalance(order.calcTotalBalance());
 
 		String newVersion = UUID.randomUUID().toString();
-		long serialNum = -1L;
+		int serialNum = -1;
 		if(order.isBuy()) {
 			serialNum = dealBuyOrder(order, stock, newVersion);
 		}else if(order.isSell()) {
@@ -86,8 +84,8 @@ public class OrderController {
 			throw new CommonException(3, "买卖委托失败!");
 		}
 		ResultBean resultBean = new ResultBean("下单成功");
-		resultBean.setResults("result", serialNum);
-		return new ResultBean("下单成功");
+		resultBean.setResults("orderId", serialNum);
+		return resultBean;
 	}
 
 	/**
@@ -96,7 +94,7 @@ public class OrderController {
 	 * @param newVersion
 	 * @return
 	 */
-	private long dealSellOrder(Order order, String newVersion) {
+	private int dealSellOrder(Order order, String newVersion) {
 		HoldStock holdStock = tradeService.queryHoldStock(order.getAccountId(), order.getMarketId(), order.getStockCode());
 		//持仓校验
 		checkCondition(holdStock == null, "持仓不存在");
@@ -104,8 +102,8 @@ public class OrderController {
 		int maxSellQty = holdStock.getCurrentQty();
 		checkCondition(maxSellQty >= 100 && maxSellQty != order.getOrderQty() && order.getOrderQty() % 100 == 0, "非平仓卖出数量必须为100股整数倍");
 		checkCondition(maxSellQty < 100 && order.getOrderQty() != maxSellQty, "最大可卖数小于100，应一次性全部卖出");
-		long serialNum = tradeService.addSellOrder(order,holdStock,newVersion);
-		return serialNum;
+		tradeService.addSellOrder(order,holdStock,newVersion);
+		return order.getOrderId();
 	}
 
 	/**
@@ -115,15 +113,14 @@ public class OrderController {
 	 * @param newVersion
 	 * @return
 	 */
-	private long dealBuyOrder(Order order, Stock stock, String newVersion) {
+	private int dealBuyOrder(Order order, Stock stock, String newVersion) {
 		checkCondition(!(order.getOrderQty() % 100 == 0), "买入数量必须是整数并且是100的整数倍");
 		//买入规则校验
 		ruleService.compareTradeRule(order, stock);
 		Account account = tradeService.queryAccount(order.getAccountId());
 		//交易账户校验
 		checkCondition(order.getTotalBalance()> account.getCurrentBalance() || account.getCurrentBalance() <= 0, "可用资金不足");
-		long serialNum = tradeService.addBuyOrder(order,account,newVersion);
-		return serialNum;
+		return tradeService.addBuyOrder(order,account,newVersion);
 	}
 
 	/**
@@ -178,7 +175,6 @@ public class OrderController {
 	}
 	
 	@GetMapping("/query/today")
-	@ResponseBody
 	public ResultBean queryTodayOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryTodayOrder(accountId,pageIndex,pageSize);
 		
@@ -194,7 +190,6 @@ public class OrderController {
 	}
 	
 	@GetMapping("/query/hist")
-	@ResponseBody
 	public ResultBean queryHistOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryHistOrder(accountId,pageIndex,pageSize);
 		
@@ -210,7 +205,6 @@ public class OrderController {
 	}
 	
 	@GetMapping("/query/cancel")
-	@ResponseBody
 	public ResultBean queryCancelOrder(Integer accountId,@RequestParam(defaultValue = "1")int pageIndex,@RequestParam(defaultValue = "8")int pageSize) {
 		DBPage<Order> list = tradeService.queryCancelOrder(accountId,pageIndex,pageSize);
 		ResultBean resultBean = new ResultBean();
@@ -219,11 +213,37 @@ public class OrderController {
 	}
 	
 	@PostMapping("/add/cancel")
-	@ResponseBody
 	public ResultBean queryCancelOrder(Integer accountId,Integer orderId){
-		Order order = tradeService.queryOrder(orderId);
+		Order order = tradeService.queryOrder(accountId,orderId);
 		checkCondition(order == null, "当前查询的委托不存在");
 		log.info("查询的委托信息:{}",order);
-		return null;
+		
+		ResultBean result = new ResultBean();
+		if("2".equals(order.getTradeStatus())) {
+			result.setMsg("委托已经成交，不能申请撤单");
+			return result;
+		}
+		
+		if("3".equals(order.getTradeStatus())) {
+			result.setMsg("申请撤单已经提交，不能重复提交");
+			return result;
+		}
+		
+		if("4".equals(order.getTradeStatus())) {
+			result.setMsg("订单已经撤单，不能重复撤单");
+			return result;
+		}
+		
+		if(!DateUtils.isNotTradeTime() || "1".equals(order.getTradeStatus())) {
+			//交易时间内撤单
+			tradeService.cancelOrder(accountId,orderId);
+			result.setMsg("申请撤单成功").setResults("orderId",orderId);
+			return result;
+		}else {
+			//非交易时间内撤单
+			tradeService.outTimeCancelOrder(accountId,order);
+			result.setMsg("撤单成功").setResults("orderId", orderId);
+			return result;
+		}
 	}
 }

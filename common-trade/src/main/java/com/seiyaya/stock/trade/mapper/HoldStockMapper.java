@@ -16,4 +16,6 @@ public interface HoldStockMapper {
 
 	List<HoldStock> queryHoldStockList(DBParam param);
 
+	void updateHoldStock(DBParam param);
+
 }

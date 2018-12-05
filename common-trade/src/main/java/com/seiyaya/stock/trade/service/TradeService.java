@@ -38,7 +38,7 @@ public interface TradeService {
 	 * @param newVersion
 	 * @return
 	 */
-	long addBuyOrder(Order order, Account account, String newVersion);
+	int addBuyOrder(Order order, Account account, String newVersion);
 
 	/**
 	 * 处理卖出委托
@@ -46,7 +46,7 @@ public interface TradeService {
 	 * @param newVersion
 	 * @return
 	 */
-	long addSellOrder(Order order, HoldStock holdStock, String newVersion);
+	int addSellOrder(Order order, HoldStock holdStock, String newVersion);
 
 	/**
 	 * 查询今日委托
@@ -80,7 +80,7 @@ public interface TradeService {
 	 * @param orderId
 	 * @return
 	 */
-	Order queryOrder(Integer orderId);
+	Order queryOrder(Integer accountId,Integer orderId);
 
 	/**
 	 * 查询今日成交
@@ -122,4 +122,18 @@ public interface TradeService {
 	 * @return
 	 */
 	Integer addAccount(Integer userId, String accountName);
+
+	/**
+	 * 交易时间内
+	 * @param accountId
+	 * @param orderId
+	 */
+	void cancelOrder(Integer accountId, Integer orderId);
+
+	/**
+	 * 非交易时间内撤单
+	 * @param accountId
+	 * @param orderId
+	 */
+	void outTimeCancelOrder(Integer accountId, Order order);
 }
