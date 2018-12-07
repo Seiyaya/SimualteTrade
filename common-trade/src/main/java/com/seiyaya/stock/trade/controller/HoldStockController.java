@@ -1,6 +1,7 @@
 package com.seiyaya.stock.trade.controller;
 
 import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
+import static com.seiyaya.common.utils.NumberFormatUtils.formatNumber;
 
 import java.util.List;
 
@@ -53,11 +54,13 @@ public class HoldStockController {
 					holdStock.setStockName(stock.getStockName());
 					holdStock.setMarketBalance(stock.getNowPrice()*holdStock.getTotalQty());
 					holdStock.setYesterday(stock.getYesterday());
-					holdStock.setProfit((stock.getNowPrice() - holdStock.getHoldPrice()) * holdStock.getTotalQty());
-					holdStock.setProfitRate((stock.getNowPrice() - holdStock.getHoldPrice())/ holdStock.getHoldPrice()*100);
+					//浮动盈亏
+					holdStock.setProfit(formatNumber((stock.getNowPrice() - holdStock.getHoldPrice()) * holdStock.getTotalQty()));
+					holdStock.setProfitRate(formatNumber((stock.getNowPrice() - holdStock.getHoldPrice())/ holdStock.getHoldPrice()*100));
 					holdStock.setDayPercentage(stock.getDayPercentage());
 					holdStock.setNowPrice(stock.getNowPrice());
-					holdStock.setPosition(holdStock.getMarketBalance()/account.getTotalAssets());
+					//个股仓位
+					holdStock.setPosition(formatNumber(holdStock.getMarketBalance()/account.getTotalAssets()*100));
 				}else {
 					log.warn("{}->{}没有行情",holdStock.getMarketId(),holdStock.getStockCode());
 				}

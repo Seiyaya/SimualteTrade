@@ -44,4 +44,10 @@ public interface OrderMapper {
 	 * @param orderParam
 	 */
 	void updateOrderDone(DBParam orderParam);
+
+	/**
+	 * 添加委托理由
+	 * @param remarkParam
+	 */
+	void addOrderRemark(DBParam remarkParam);
 }

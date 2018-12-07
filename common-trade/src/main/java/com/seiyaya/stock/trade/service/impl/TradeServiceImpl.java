@@ -4,6 +4,7 @@ import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,16 @@ public class TradeServiceImpl implements TradeService {
 				.set("stock_code", order.getStockCode());
 		int flag = holdStockMapper.updateCurrentQty(param);
 		if (flag == 1) {
-			return orderMapper.addOrder(order);
+			orderMapper.addOrder(order);
+			if(!StringUtils.isEmpty(order.getRemark())) {
+				//添加委托理由
+				DBParam remarkParam = new DBParam()
+						.set("order_id", order.getOrderId())
+						.set("content", order.getRemark())
+						.set("create_date", DateUtils.formatNowTime());
+				orderMapper.addOrderRemark(remarkParam);
+			}
+			return order.getOrderId();
 		} else {
 			log.error("账户id为:{} 乐观锁失败! 委托信息:{}", order.getAccountId(), order);
 			return -1;

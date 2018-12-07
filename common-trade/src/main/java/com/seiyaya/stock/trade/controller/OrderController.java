@@ -4,6 +4,7 @@ import static com.seiyaya.common.utils.CheckConditionUtils.checkCondition;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +49,10 @@ public class OrderController {
 	public ResultBean addOrder(Order order) {
 		checkCondition(commonTradeService.isSettlementTime() && DateUtils.isSettlementTime(), "系统清算期间不能进行交易操作");
 		checkCondition(!order.validate(), "委托单参数不合法");
-
+		if(StringUtils.isEmpty(order.getOrderType())) {
+			order.setOrderType(Order.LIMITPRICE);
+		}
+		
 		Stock stock = stockCacheService.getStockByKey(order.getMarketId() + order.getStockCode());
 		checkCondition(stock == null, "未找到当天证券信息");
 
@@ -78,6 +82,8 @@ public class OrderController {
 		}else if(order.isSell()) {
 			serialNum = dealSellOrder(order, newVersion);
 		}
+		//TODO:将完成的订单推送到rabbitMQ,用来解决多台撮合开启的问题
+		
 		//下委托
 		if (serialNum < 0) {
 			log.error("买卖委托失败:{}",order);

@@ -37,6 +37,7 @@ public class Order {
 	private String dealFlag;
 	private int matchNo = 0;
 	private String stockType;
+	private String remark;
 	
 	
 	/**************非持久化属性*******************/
