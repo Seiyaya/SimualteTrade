@@ -80,7 +80,7 @@
 		select * from t_sim_order 
 		<where>
 			account_id = #{account_id}
-			<if test="cancel_status!=null and cancel_status!=''">and trade_status != 3 and deal_flag != 2</if>
+			<if test="cancel_status!=null and cancel_status!=''">and trade_status != #{cancel_status} and deal_flag != 2</if>
 		</where>
 	</select>
 	

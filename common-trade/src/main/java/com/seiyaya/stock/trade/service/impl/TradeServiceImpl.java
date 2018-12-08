@@ -13,6 +13,7 @@ import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.DBPage;
 import com.seiyaya.common.bean.DBParam;
+import com.seiyaya.common.bean.EnumValue;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.common.bean.SystemConfig;
@@ -126,7 +127,7 @@ public class TradeServiceImpl implements TradeService {
 		PageHelper.startPage(pageIndex, pageSize);
 		DBParam param = new DBParam()
 				.set("account_id", accountId)
-				.set("cancel_status", "3");
+				.set("cancel_status", EnumValue.TRADE_STATUS_3);
 		List<Order> orderList = orderMapper.queryTodayOrderList(param);
 		DBPage<Order> result = new DBPage<>(orderList);
 		return result;
@@ -217,7 +218,7 @@ public class TradeServiceImpl implements TradeService {
 				.set("order_id", orderId)
 				.set("account_id", accountId)
 				.set("create_date", DateUtils.formatNowTime())
-				.set("cancel_status", "0")
+				.set("cancel_status", EnumValue.CANCEL_STATUS_0)
 				.set("cancel_date", DateUtils.formatNowDate());
 		
 		DBParam updateOrder = new DBParam()
@@ -253,7 +254,7 @@ public class TradeServiceImpl implements TradeService {
 				.set("account_id", order.getAccountId())
 				.set("create_date", DateUtils.formatNowTime())
 				.set("cancel_date", DateUtils.formatNowDate())
-				.set("cancel_status", "1");
+				.set("cancel_status", EnumValue.CANCEL_STATUS_1);
 		orderMapper.addCancelOrder(cancelParam);
 	}
 

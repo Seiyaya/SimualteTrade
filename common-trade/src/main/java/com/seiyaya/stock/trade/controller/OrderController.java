@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.seiyaya.common.bean.Account;
 import com.seiyaya.common.bean.DBPage;
+import com.seiyaya.common.bean.EnumValue;
 import com.seiyaya.common.bean.FreeRate;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
@@ -225,22 +226,22 @@ public class OrderController {
 		log.info("查询的委托信息:{}",order);
 		
 		ResultBean result = new ResultBean();
-		if("2".equals(order.getTradeStatus())) {
+		if(EnumValue.TRADE_STATUS_2.equals(order.getTradeStatus())) {
 			result.setMsg("委托已经成交，不能申请撤单");
 			return result;
 		}
 		
-		if("3".equals(order.getTradeStatus())) {
+		if(EnumValue.TRADE_STATUS_3.equals(order.getTradeStatus())) {
 			result.setMsg("申请撤单已经提交，不能重复提交");
 			return result;
 		}
 		
-		if("4".equals(order.getTradeStatus())) {
+		if(EnumValue.TRADE_STATUS_4.equals(order.getTradeStatus())) {
 			result.setMsg("订单已经撤单，不能重复撤单");
 			return result;
 		}
 		
-		if(!DateUtils.isNotTradeTime() || "1".equals(order.getTradeStatus())) {
+		if(!DateUtils.isNotTradeTime() || EnumValue.TRADE_STATUS_1.equals(order.getTradeStatus())) {
 			//交易时间内撤单
 			tradeService.cancelOrder(accountId,orderId);
 			result.setMsg("申请撤单成功").setResults("orderId",orderId);
