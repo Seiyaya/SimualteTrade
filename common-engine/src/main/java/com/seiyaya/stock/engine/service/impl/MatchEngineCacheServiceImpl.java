@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.springframework.stereotype.Service;
 
 import com.seiyaya.common.bean.Bargain;
+import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.stock.engine.service.MatchEngineCacheService;
 import com.seiyaya.stock.engine.util.MatchEngineCache;
@@ -26,7 +27,7 @@ public class MatchEngineCacheServiceImpl implements MatchEngineCacheService{
 	@Override
 	public void addCanelOrderToCache(List<Order> orderList) {
 		orderList.forEach((order) ->{
-			MatchEngineCache.addCancelOrder(order.getAccountId());
+			MatchEngineCache.addCancelOrder(order.getOrderId());
 		});
 		orderList.clear();
 	}
@@ -49,5 +50,15 @@ public class MatchEngineCacheServiceImpl implements MatchEngineCacheService{
 	@Override
 	public ConcurrentLinkedQueue<Bargain> getBargainQueue() {
 		return MatchEngineCache.getBargainQueue();
+	}
+
+	@Override
+	public void addCompleteProfit(CompleteProfit profit) {
+		
+	}
+
+	@Override
+	public void addPositionChange(Bargain bargain) {
+		
 	}
 }

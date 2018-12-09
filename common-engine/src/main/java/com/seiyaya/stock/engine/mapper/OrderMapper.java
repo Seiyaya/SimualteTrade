@@ -18,4 +18,8 @@ public interface OrderMapper {
 
 	void updateCancelOrderList(List<DBParam> params);
 
+	void updateOrder(DBParam orderParam);
+
+	void updateCancelOrder(DBParam cancelParam);
+
 }

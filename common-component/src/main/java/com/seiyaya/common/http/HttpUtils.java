@@ -62,7 +62,7 @@ public class HttpUtils {
 		Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
 				.register("https", sslsf).register("http", new PlainConnectionSocketFactory()).build();
 		cm = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-		cm.setMaxTotal(500);
+		cm.setMaxTotal(50);
 		cm.setDefaultMaxPerRoute(20);
 	}
 

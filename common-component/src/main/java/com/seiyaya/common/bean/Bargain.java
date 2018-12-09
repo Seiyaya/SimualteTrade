@@ -27,4 +27,14 @@ public class Bargain {
 	
 	/*************非持久化属性***************/
 	private String tradeTypeName;
+	private String tradeStatus;
+	private double orderBalance;
+	
+	public boolean isSell() {
+		return EnumValue.TRADE_TYPE_1.equals(tradeType);
+	}
+	
+	public boolean isBuy() {
+		return EnumValue.TRADE_TYPE_0.equals(tradeType);
+	}
 }

@@ -46,4 +46,12 @@ public interface MatchEngineService {
 	 */
 	void dealBargains(ConcurrentLinkedQueue<Bargain> value);
 
+	void dealBuyBargain(Bargain bargain);
+
+	void dealSellBargain(Bargain bargain);
+
+	void dealBuyCancelBargain(Bargain bargain);
+
+	void dealSellCancelBargain(Bargain bargain);
+
 }

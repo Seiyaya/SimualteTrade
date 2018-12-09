@@ -94,7 +94,7 @@ public class EnumValue {
 	public static final String DEAL_FLAG_0 = "0";
 	
 	/**
-	 * 已处理
+	 * 正在处理
 	 */
 	public static final String DEAL_FLAG_1 = "1";
 	

@@ -55,7 +55,6 @@ public class StockWriteTask {
 		}
 		
 		map.entrySet().forEach((entry) ->{
-			Integer key = entry.getKey();
 			if(!entry.getValue().isEmpty()) {
 				matchEngineService.dealBargains(entry.getValue());
 			}

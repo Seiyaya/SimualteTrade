@@ -1,6 +1,7 @@
 package com.seiyaya.stock.engine.util;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -53,8 +54,18 @@ public class MatchEngineCache {
 		CANCEL_ORDER.add(orderId);
 	}
 
+	/**
+	 * 获取需要撮合的委托单
+	 * @return
+	 */
 	public static ConcurrentLinkedQueue<Order> getMatchOrderQueue() {
-		return ORDER_QUEUE;
+		ConcurrentLinkedQueue<Order> orderTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<Order> iterator = ORDER_QUEUE.iterator();iterator.hasNext();) {
+			Order order = iterator.next();
+			orderTmp.add(order);
+			ORDER_QUEUE.remove();
+		}
+		return orderTmp;
 	}
 
 	public static void addBargain(Bargain bargain) {
@@ -62,7 +73,13 @@ public class MatchEngineCache {
 	}
 
 	public static ConcurrentLinkedQueue<Bargain> getBargainQueue() {
-		return BARGAIN_QUEUE;
+		ConcurrentLinkedQueue<Bargain> bargainTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<Bargain> iterator = BARGAIN_QUEUE.iterator();iterator.hasNext();) {
+			Bargain bargain = iterator.next();
+			bargainTmp.add(bargain);
+			BARGAIN_QUEUE.remove();
+		}
+		return bargainTmp;
 	}
 
 }

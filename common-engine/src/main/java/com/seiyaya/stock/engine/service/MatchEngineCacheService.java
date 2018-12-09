@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.seiyaya.common.bean.Bargain;
+import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
 
 public interface MatchEngineCacheService {
@@ -23,4 +24,8 @@ public interface MatchEngineCacheService {
 	void addBargainToCache(Bargain bargain);
 
 	ConcurrentLinkedQueue<Bargain> getBargainQueue();
+
+	void addCompleteProfit(CompleteProfit profit);
+
+	void addPositionChange(Bargain bargain);
 }
