@@ -9,7 +9,7 @@ import com.seiyaya.stock.engine.service.MatchEngineService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BargainWriteWorker extends AbstractWorker{
+public class BargainWriteWorker extends AbstractWorker<Void>{
 
 	private Bargain bargain;
 	
@@ -22,13 +22,14 @@ public class BargainWriteWorker extends AbstractWorker{
 	}
 	
 	@Override
-	protected void execute() {
+	protected Void execute() {
 		try {
 			dealBargain();
 		} catch (Exception e) {
 			log.error("写入成交单异常:",e);
 			matchEngineCacheService.addBargainToCache(bargain);
 		}
+		return null;
 	}
 
 	/**

@@ -125,4 +125,16 @@ public class DateUtils {
 	public static String formatNowTime() {
 		return DateTime.now().toString("HH:mm");
 	}
+
+	/**
+	 * 在两段的交易时间内
+	 * @return
+	 */
+	public static boolean inTwoTradeTime() {
+		Calendar now = Calendar.getInstance(Locale.CHINA);
+		int hour = now.get(Calendar.HOUR_OF_DAY);
+		int minute = now.get(Calendar.MINUTE);
+		int minutes = hour * 60 + minute; //
+		return (minutes >= 570 && minutes <= 690) || (minutes >= 780 && minutes <= 900);
+	}
 }

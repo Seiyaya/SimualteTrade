@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.utils.DateUtils;
 import com.seiyaya.stock.engine.service.MatchEngineService;
 import com.seiyaya.stock.engine.service.MatchEngineCacheService;
 import com.seiyaya.stock.service.StockCacheService;
@@ -35,7 +36,7 @@ public class StockReadTask {
 	 *  扫描普通需要撮合的委托
 	 */
 	public void readNeedMatchOrder() {
-		if(!stockCacheService.isTradeDate()) {
+		if(!stockCacheService.isTradeDate() || !DateUtils.inTwoTradeTime()) {
 			return ;
 		}
 		

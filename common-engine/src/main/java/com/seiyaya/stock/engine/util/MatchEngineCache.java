@@ -7,7 +7,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.seiyaya.common.bean.Bargain;
+import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.bean.PositionChange;
 
 /**
  * 撮合匹配相关缓存
@@ -31,6 +33,16 @@ public class MatchEngineCache {
 	 * 成交队列
 	 */
 	private static ConcurrentLinkedQueue<Bargain> BARGAIN_QUEUE = new ConcurrentLinkedQueue<>();
+	
+	/**
+	 * 完整收益
+	 */
+	private static ConcurrentLinkedQueue<CompleteProfit> COMPLETE_PROFIT_QUEUE = new ConcurrentLinkedQueue<>();
+	
+	/**
+	 * 仓位变动
+	 */
+	private static ConcurrentLinkedQueue<PositionChange> POSITION_CHANGE_QUEUE = new ConcurrentLinkedQueue<>();
 
 	/**
 	 * 是否在撤单队列中
@@ -66,6 +78,26 @@ public class MatchEngineCache {
 			ORDER_QUEUE.remove();
 		}
 		return orderTmp;
+	}
+	
+	public static ConcurrentLinkedQueue<CompleteProfit> getCompleteProfitQueue(){
+		ConcurrentLinkedQueue<CompleteProfit> profitTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<CompleteProfit> iterator = COMPLETE_PROFIT_QUEUE.iterator();iterator.hasNext();) {
+			CompleteProfit profit = iterator.next();
+			profitTmp.add(profit);
+			COMPLETE_PROFIT_QUEUE.remove();
+		}
+		return profitTmp;
+	}
+	
+	public static ConcurrentLinkedQueue<PositionChange> getPositionQueue(){
+		ConcurrentLinkedQueue<PositionChange> changeTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<PositionChange> iterator = POSITION_CHANGE_QUEUE.iterator();iterator.hasNext();) {
+			PositionChange change = iterator.next();
+			changeTmp.add(change);
+			POSITION_CHANGE_QUEUE.remove();
+		}
+		return changeTmp;
 	}
 
 	public static void addBargain(Bargain bargain) {

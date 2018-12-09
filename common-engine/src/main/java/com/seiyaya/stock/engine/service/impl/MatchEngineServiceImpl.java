@@ -12,6 +12,7 @@ import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.EnumValue;
+import com.seiyaya.common.bean.FreeRate;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.common.bean.Stock;
@@ -92,19 +93,17 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 	}
 
 	@Override
-	public void dealCancelOrder(Order order) {
+	public Bargain dealCancelOrder(Order order) {
 		Bargain bargain = new Bargain();
 		bargain.setAccountId(order.getAccountId());
 		bargain.setOrderId(order.getOrderId());
-		matchEngineCacheService.addBargainToCache(bargain);
-		
-		if(log.isInfoEnabled()) {
-			log.info("委托{},撤单成功，加入写队列",order.getOrderId());
-		}
+		bargain.setTradeType(order.getTradeType());
+//		matchEngineCacheService.addBargainToCache(bargain);
+		return bargain;
 	}
 
 	@Override
-	public void dealBuyOrder(Order order) {
+	public Bargain dealBuyOrder(Order order) {
 		boolean isMatch = false;
 
 		Stock stock = stockCacheService.getStockByKey(order.getMarketId() + order.getStockCode());
@@ -112,10 +111,9 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			if (stock != null) {
 				order.setStockType(stock.getStockType());
 				if (isBuyMatch(order, stock)) {
-					double nowPrice = stock.getNowPrice();
-					Bargain bargain = getMatchBargainData(order,nowPrice);
+					Bargain bargain = getMatchBargainData(order,stock);
 					matchEngineCacheService.addBargainToCache(bargain);
-					log.info("委托编号");
+					return bargain;
 				}
 				isMatch = true;
 			} else {
@@ -132,10 +130,29 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 		if (log.isInfoEnabled()) {
 			log.info("委托{},买入成功，加入写队列", order.getOrderId());
 		}
+		return null;
 	}
 
-	private Bargain getMatchBargainData(Order order, double nowPrice) {
-		return null;
+	private Bargain getMatchBargainData(Order order, Stock stock) {
+		Bargain bargain = new Bargain();
+		bargain.setAccountId(order.getAccountId());
+		bargain.setOrderId(order.getOrderId());
+		bargain.setMarketId(order.getMarketId());
+		bargain.setStockCode(order.getStockCode());
+		bargain.setExecPrice(stock.getNowPrice());
+		bargain.setExecQty(order.getOrderQty());
+		bargain.setTradeType(order.getTradeType());
+		bargain.setExecDate(DateUtils.formatNowDate());
+		bargain.setExecTime(DateUtils.formatNowTime());
+		bargain.setBargainBalance(order.getOrderQty() * bargain.getExecPrice());
+		bargain.setTradeStatus(EnumValue.TRADE_STATUS_2);
+		FreeRate freeRate = new FreeRate(bargain);
+		bargain.setStapTax(freeRate.getStaptaxFree());
+		bargain.setCommission(freeRate.getCommissoinFree());
+		bargain.setTransferFree(freeRate.getTransferFree());
+		bargain.setTotalBalance(bargain.calcTotalBalance());
+		bargain.setTotalFare(freeRate.getTotalFare());
+		return bargain;
 	}
 
 	/**
@@ -154,7 +171,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 	}
 
 	@Override
-	public void dealSellOrder(Order order) {
+	public Bargain dealSellOrder(Order order) {
 		boolean isMatch = false;
 		
 		Stock stock = stockCacheService.getStockByKey(order.getMarketId()+order.getStockCode());
@@ -162,7 +179,9 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			if (stock != null) {
 				order.setStockType(stock.getStockType());
 				if (isSellMatch(order, stock)) {
+					Bargain bargain = getMatchBargainData(order, stock);
 					isMatch = true;
+					return bargain;
 				}
 			} else {
 				log.error("处理:{}，行情信息不存在:{}:{}", order.getOrderId(), order.getMarketId(), order.getStockCode());
@@ -178,6 +197,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 		if(log.isInfoEnabled()) {
 			log.info("委托{},卖出成功，加入写队列",order.getOrderId());
 		}
+		return null;
 	}
 
 	/**

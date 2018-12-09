@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.utils.DateUtils;
 import com.seiyaya.stock.engine.service.MatchEngineCacheService;
 import com.seiyaya.stock.engine.util.MatchEngine;
 import com.seiyaya.stock.service.StockCacheService;
@@ -35,14 +36,19 @@ public class StockMatchTask {
 	 * 执行撮合
 	 */
 	public void stockMatch() {
-		if(!stockCacheService.isTradeDate()) {
+		if(!stockCacheService.isTradeDate() || !DateUtils.inTwoTradeTime()) {
+			//非交易日或者非交易时间不执行
 			return ;
 		}
 		
 		ConcurrentLinkedQueue<Order> orderQueue = matchEngineCacheService.getMatchOrderQueue();
 		if(!CollectionUtils.isEmpty(orderQueue)) {
 			log.info("撮合的委托单数量:",orderQueue.size());
-			matchEngine.addOrderList(orderQueue);
+			try {
+				matchEngine.addOrderList(orderQueue);
+			} catch (Exception e) {
+				log.error("撮合委托单出现异常",e);
+			}
 		}
 	}
 }

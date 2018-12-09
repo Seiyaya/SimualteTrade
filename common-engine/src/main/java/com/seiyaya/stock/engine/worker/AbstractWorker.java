@@ -1,19 +1,30 @@
 package com.seiyaya.stock.engine.worker;
 
-public abstract class AbstractWorker implements Runnable {
+import java.util.concurrent.Callable;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public abstract class AbstractWorker<T> implements Callable<T> {
 	
-	protected abstract void execute();
+	protected abstract T execute();
 	
-	public void run() {
+	public T call() {
 		before();
-		execute();
+		T t = execute();
 		after();
+		return t;
 	}
 	
 	protected void before() {
+		if(log.isDebugEnabled()) {
+			log.debug("work before");
+		}
 	}
 	
 	protected void after() {
-		
+		if(log.isDebugEnabled()) {
+			log.debug("work after");
+		}
 	}
 }

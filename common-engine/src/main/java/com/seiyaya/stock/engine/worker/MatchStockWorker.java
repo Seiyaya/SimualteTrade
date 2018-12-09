@@ -1,5 +1,6 @@
 package com.seiyaya.stock.engine.worker;
 
+import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.Order;
 import com.seiyaya.common.utils.SpringUtils;
 import com.seiyaya.stock.engine.service.MatchEngineCacheService;
@@ -8,7 +9,7 @@ import com.seiyaya.stock.engine.service.MatchEngineService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MatchStockWorker extends AbstractWorker{
+public class MatchStockWorker extends AbstractWorker<Bargain>{
 	
 	private Order order;
 	
@@ -21,19 +22,23 @@ public class MatchStockWorker extends AbstractWorker{
 	}
 
 	@Override
-	protected void execute() {
+	protected Bargain execute() {
 		if(order != null) {
+			Bargain bargain = null;
 			if(log.isInfoEnabled()) {
 				log.info("处理委托单-->{}",order);
 			}
 			if(matchEngineCacheService.isCancel(order.getOrderId())) {
-				matchEngineService.dealCancelOrder(order);
+				bargain = matchEngineService.dealCancelOrder(order);
 			}else if(order.isBuy()) {
-				matchEngineService.dealBuyOrder(order);
+				bargain = matchEngineService.dealBuyOrder(order);
 			}else if(order.isSell()) {
-				matchEngineService.dealSellOrder(order);
+				bargain = matchEngineService.dealSellOrder(order);
 			}
+			return bargain;
 		}
+		log.error("错误的交易类型:{} --> {}",order.getOrderId(),order.getTradeType());
+		return null;
 	}
 
 }

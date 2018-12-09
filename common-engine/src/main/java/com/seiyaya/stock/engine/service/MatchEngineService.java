@@ -26,19 +26,19 @@ public interface MatchEngineService {
 	 * 处理撤单委托
 	 * @param order
 	 */
-	void dealCancelOrder(Order order);
+	Bargain dealCancelOrder(Order order);
 
 	/**
 	 * 处理买入委托
 	 * @param order
 	 */
-	void dealBuyOrder(Order order);
+	Bargain dealBuyOrder(Order order);
 
 	/**
 	 * 处理卖出委托
 	 * @param order
 	 */
-	void dealSellOrder(Order order);
+	Bargain dealSellOrder(Order order);
 
 	/**
 	 * 处理成交

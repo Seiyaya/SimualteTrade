@@ -20,6 +20,7 @@ public class Bargain {
 	private double commission;
 	private double fare;
 	private double totalBalance;
+	private double bargainBalance;
 	private String remark;
 	private double transferFree;
 	private double totalFare;
@@ -29,6 +30,7 @@ public class Bargain {
 	private String tradeTypeName;
 	private String tradeStatus;
 	private double orderBalance;
+	private String stockType;
 	
 	public boolean isSell() {
 		return EnumValue.TRADE_TYPE_1.equals(tradeType);
@@ -36,5 +38,14 @@ public class Bargain {
 	
 	public boolean isBuy() {
 		return EnumValue.TRADE_TYPE_0.equals(tradeType);
+	}
+
+	public double calcTotalBalance() {
+		if(isBuy()) {
+			totalBalance = bargainBalance + totalFare;
+		}else{
+			totalBalance = bargainBalance - totalFare;
+		}
+		return totalBalance;
 	}
 }
