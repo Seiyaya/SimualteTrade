@@ -15,6 +15,7 @@ import com.seiyaya.common.bean.EnumValue;
 import com.seiyaya.common.bean.FreeRate;
 import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.bean.PositionChange;
 import com.seiyaya.common.bean.Stock;
 import com.seiyaya.common.utils.DateUtils;
 import com.seiyaya.stock.engine.mapper.BargainMapper;
@@ -329,8 +330,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			//清仓,直接删除持仓
 			bargainMapper.delHoldStock(holdStock.getHoldId());
 			//计算完整收益
-			CompleteProfit profit = packageCompleteProfit(bargain);
-			matchEngineCacheService.addCompleteProfit(profit);
+			matchEngineCacheService.addCompleteProfit(bargain);
 		}else {
 			//减仓
 			updateHoldStock(bargain, holdStock);
@@ -339,16 +339,6 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 		updateAccount(bargain);
 		//仓位变动添加计算
 		matchEngineCacheService.addPositionChange(bargain);
-	}
-
-	private CompleteProfit packageCompleteProfit(Bargain bargain) {
-		CompleteProfit profit = new CompleteProfit();
-		profit.setMarketId(bargain.getMarketId());
-		profit.setStockCode(bargain.getStockCode());
-		profit.setStockName(bargain.getStockName());
-		profit.setAccountId(bargain.getAccountId());
-		profit.setHoldId(bargain.getHoldId());
-		return profit;
 	}
 
 	@Override
@@ -386,5 +376,15 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 				.set("order_id", bargain.getOrderId());
 		orderMapper.updateOrder(orderParam);
 		orderMapper.updateCancelOrder(cancelParam);
+	}
+
+	@Override
+	public void addCompleteProfitList(List<CompleteProfit> completeProfitList) {
+		bargainMapper.addCompleteProfitList(completeProfitList);
+	}
+
+	@Override
+	public void addPositionChangeList(List<PositionChange> positionChangeList) {
+		bargainMapper.addPositionChangeList(positionChangeList);
 	}
 }

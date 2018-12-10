@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.seiyaya.common.bean.Bargain;
+import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
+import com.seiyaya.common.bean.PositionChange;
 
 public interface MatchEngineService {
 
@@ -53,5 +55,17 @@ public interface MatchEngineService {
 	void dealBuyCancelBargain(Bargain bargain);
 
 	void dealSellCancelBargain(Bargain bargain);
+
+	/**
+	 * 批量写入完整收益
+	 * @param completeProfitList
+	 */
+	void addCompleteProfitList(List<CompleteProfit> completeProfitList);
+
+	/**
+	 * 批量写入仓位变动
+	 * @param positionChangeList
+	 */
+	void addPositionChangeList(List<PositionChange> positionChangeList);
 
 }

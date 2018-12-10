@@ -7,9 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.seiyaya.common.bean.Bargain;
-import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
-import com.seiyaya.common.bean.PositionChange;
 
 /**
  * 撮合匹配相关缓存
@@ -37,12 +35,12 @@ public class MatchEngineCache {
 	/**
 	 * 完整收益
 	 */
-	private static ConcurrentLinkedQueue<CompleteProfit> COMPLETE_PROFIT_QUEUE = new ConcurrentLinkedQueue<>();
+	private static ConcurrentLinkedQueue<Bargain> COMPLETE_PROFIT_QUEUE = new ConcurrentLinkedQueue<>();
 	
 	/**
 	 * 仓位变动
 	 */
-	private static ConcurrentLinkedQueue<PositionChange> POSITION_CHANGE_QUEUE = new ConcurrentLinkedQueue<>();
+	private static ConcurrentLinkedQueue<Bargain> POSITION_CHANGE_QUEUE = new ConcurrentLinkedQueue<>();
 
 	/**
 	 * 是否在撤单队列中
@@ -80,20 +78,20 @@ public class MatchEngineCache {
 		return orderTmp;
 	}
 	
-	public static ConcurrentLinkedQueue<CompleteProfit> getCompleteProfitQueue(){
-		ConcurrentLinkedQueue<CompleteProfit> profitTmp = new ConcurrentLinkedQueue<>();
-		for(Iterator<CompleteProfit> iterator = COMPLETE_PROFIT_QUEUE.iterator();iterator.hasNext();) {
-			CompleteProfit profit = iterator.next();
+	public static ConcurrentLinkedQueue<Bargain> getCompleteProfitQueue(){
+		ConcurrentLinkedQueue<Bargain> profitTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<Bargain> iterator = COMPLETE_PROFIT_QUEUE.iterator();iterator.hasNext();) {
+			Bargain profit = iterator.next();
 			profitTmp.add(profit);
 			COMPLETE_PROFIT_QUEUE.remove();
 		}
 		return profitTmp;
 	}
 	
-	public static ConcurrentLinkedQueue<PositionChange> getPositionQueue(){
-		ConcurrentLinkedQueue<PositionChange> changeTmp = new ConcurrentLinkedQueue<>();
-		for(Iterator<PositionChange> iterator = POSITION_CHANGE_QUEUE.iterator();iterator.hasNext();) {
-			PositionChange change = iterator.next();
+	public static ConcurrentLinkedQueue<Bargain> getPositionQueue(){
+		ConcurrentLinkedQueue<Bargain> changeTmp = new ConcurrentLinkedQueue<>();
+		for(Iterator<Bargain> iterator = POSITION_CHANGE_QUEUE.iterator();iterator.hasNext();) {
+			Bargain change = iterator.next();
 			changeTmp.add(change);
 			POSITION_CHANGE_QUEUE.remove();
 		}
@@ -112,6 +110,14 @@ public class MatchEngineCache {
 			BARGAIN_QUEUE.remove();
 		}
 		return bargainTmp;
+	}
+
+	public static void addCompleteProfit(Bargain profit) {
+		COMPLETE_PROFIT_QUEUE.add(profit);
+	}
+
+	public static void addPositionChange(Bargain change) {
+		POSITION_CHANGE_QUEUE.add(change);
 	}
 
 }

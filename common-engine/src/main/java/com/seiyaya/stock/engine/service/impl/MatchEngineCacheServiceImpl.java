@@ -6,9 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.springframework.stereotype.Service;
 
 import com.seiyaya.common.bean.Bargain;
-import com.seiyaya.common.bean.CompleteProfit;
 import com.seiyaya.common.bean.Order;
-import com.seiyaya.common.bean.PositionChange;
 import com.seiyaya.stock.engine.service.MatchEngineCacheService;
 import com.seiyaya.stock.engine.util.MatchEngineCache;
 
@@ -54,22 +52,22 @@ public class MatchEngineCacheServiceImpl implements MatchEngineCacheService{
 	}
 
 	@Override
-	public void addCompleteProfit(CompleteProfit profit) {
-		
+	public void addCompleteProfit(Bargain profit) {
+		MatchEngineCache.addCompleteProfit(profit);
 	}
 
 	@Override
 	public void addPositionChange(Bargain bargain) {
-		
+		MatchEngineCache.addPositionChange(bargain);
 	}
 
 	@Override
-	public ConcurrentLinkedQueue<CompleteProfit> getCompleteProfitQueue() {
+	public ConcurrentLinkedQueue<Bargain> getCompleteProfitQueue() {
 		return MatchEngineCache.getCompleteProfitQueue();
 	}
 
 	@Override
-	public ConcurrentLinkedQueue<PositionChange> getPositionChangeQueue() {
+	public ConcurrentLinkedQueue<Bargain> getPositionChangeQueue() {
 		return MatchEngineCache.getPositionQueue();
 	}
 }

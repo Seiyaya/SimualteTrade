@@ -1,6 +1,8 @@
 package com.seiyaya.stock.engine.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -64,22 +66,34 @@ public class MatchEngine {
 	/**
 	 * 完整多线程计算，批量写入
 	 * @param completeProfits
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
-	public void addCompleteProfitList(ConcurrentLinkedQueue<CompleteProfit> completeProfits) {
-		for(Iterator<CompleteProfit> iterator = completeProfits.iterator();iterator.hasNext();) {
-			CompleteProfit completeProfit = iterator.next();
-			THREADPOOL.submit(new CompleteProfitWriteWorker(completeProfit));
+	public List<CompleteProfit> addCompleteProfitList(ConcurrentLinkedQueue<Bargain> completeProfits) throws InterruptedException, ExecutionException {
+		List<CompleteProfit> completeProfitList = new ArrayList<>();
+		for(Iterator<Bargain> iterator = completeProfits.iterator();iterator.hasNext();) {
+			Bargain completeProfit = iterator.next();
+			Future<CompleteProfit> future = THREADPOOL.submit(new CompleteProfitWriteWorker(completeProfit));
+			CompleteProfit result = future.get();
+			completeProfitList.add(result);
 		}
+		return completeProfitList;
 	}
 
 	/**
 	 * 仓位多线程计算，批量写入
 	 * @param positionChanges
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
-	public void addPositionChange(ConcurrentLinkedQueue<PositionChange> positionChanges) {
-		for(Iterator<PositionChange> iterator = positionChanges.iterator();iterator.hasNext();) {
-			PositionChange positionChange = iterator.next();
-			THREADPOOL.submit(new PositionChangeWriteWorker(positionChange));
+	public List<PositionChange> addPositionChange(ConcurrentLinkedQueue<Bargain> positionChanges) throws InterruptedException, ExecutionException {
+		List<PositionChange> positionChangeList = new ArrayList<>();
+		for(Iterator<Bargain> iterator = positionChanges.iterator();iterator.hasNext();) {
+			Bargain bargain = iterator.next();
+			Future<PositionChange> future = THREADPOOL.submit(new PositionChangeWriteWorker(bargain));
+			PositionChange positionChange = future.get();
+			positionChangeList.add(positionChange);
 		}
+		return positionChangeList;
 	}
 }

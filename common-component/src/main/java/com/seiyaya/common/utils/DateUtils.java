@@ -137,4 +137,15 @@ public class DateUtils {
 		int minutes = hour * 60 + minute; //
 		return (minutes >= 570 && minutes <= 690) || (minutes >= 780 && minutes <= 900);
 	}
+
+	/**
+	 * 获取两个时间段内交易日天数
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public static int getTradeDays(String startDate, String endDate) {
+		//TODO: 未完成
+		return 0;
+	}
 }

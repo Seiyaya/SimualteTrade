@@ -2,6 +2,7 @@ package com.seiyaya.stock.engine.task;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,12 +19,15 @@ import com.seiyaya.stock.engine.service.MatchEngineService;
 import com.seiyaya.stock.engine.util.MatchEngine;
 import com.seiyaya.stock.service.StockCacheService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 撮合写任务
  * @author Seiyaya
  *
  */
 @Component
+@Slf4j
 public class StockWriteTask {
 	
 	@Autowired
@@ -76,9 +80,14 @@ public class StockWriteTask {
 	 * 写入完整收益
 	 */
 	public void writeCompleteProfit() {
-		ConcurrentLinkedQueue<CompleteProfit> completeProfits = matchEngineCacheService.getCompleteProfitQueue();
+		ConcurrentLinkedQueue<Bargain> completeProfits = matchEngineCacheService.getCompleteProfitQueue();
 		if(!CollectionUtils.isEmpty(completeProfits)) {
-			matchEngine.addCompleteProfitList(completeProfits);
+			try {
+				List<CompleteProfit> completeProfitList = matchEngine.addCompleteProfitList(completeProfits);
+				matchEngineService.addCompleteProfitList(completeProfitList);
+			} catch (Exception e) {
+				log.error("写入完整收益出现异常:",e);
+			}
 		}
 	}
 	
@@ -86,9 +95,14 @@ public class StockWriteTask {
 	 *写入仓位变动
 	 */
 	public void writePositionChange() {
-		ConcurrentLinkedQueue<PositionChange> positionChanges = matchEngineCacheService.getPositionChangeQueue();
+		ConcurrentLinkedQueue<Bargain> positionChanges = matchEngineCacheService.getPositionChangeQueue();
 		if(!CollectionUtils.isEmpty(positionChanges)) {
-			matchEngine.addPositionChange(positionChanges);
+			try {
+				List<PositionChange> positionChangeList = matchEngine.addPositionChange(positionChanges);
+				matchEngineService.addPositionChangeList(positionChangeList);
+			} catch (Exception e) {
+				log.error("写入仓位变动出现异常:",e);
+			}
 		}
 	}
 }

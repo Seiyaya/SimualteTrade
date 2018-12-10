@@ -8,6 +8,11 @@ import com.seiyaya.stock.engine.service.MatchEngineService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 写入成交单
+ * @author Seiyaya
+ *
+ */
 @Slf4j
 public class BargainWriteWorker extends AbstractWorker<Void>{
 
