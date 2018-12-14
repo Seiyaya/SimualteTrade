@@ -90,5 +90,6 @@
 		<module>../common-component</module>
 		<module>../common-trade</module>
 		<module>../common-engine</module>
+		<module>../common-settlement</module>
 	</modules>
 </project>

@@ -37,6 +37,8 @@ public class SystemConfig {
 	public static final String DEFAULT_STAPTAX = "default_staptax";
 	public static final String DEFAULT_TRANSFER_FREE = "default_transfer_free";
 	
+	//清算相关
+	public static final String LAST_SETTLE_DATE = "last_settle_date";
 	
 	private String name;
 	private String key;

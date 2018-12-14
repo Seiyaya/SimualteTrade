@@ -29,4 +29,6 @@ public interface SystemConfigMapper {
 	List<Fare> queryFareList();
 
 	List<DBParam> queryEnumValue();
+
+	void updateSysConfig(DBParam param);
 }
