@@ -8,6 +8,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 
+import com.seiyaya.stock.service.StockCacheService;
+
 /**
  * 日期时间相关工具类
  * 
@@ -122,6 +124,10 @@ public class DateUtils {
 		return Math.abs(days);
 	}
 
+	/**
+	 * 	格式化现在的时间
+	 * @return
+	 */
 	public static String formatNowTime() {
 		return DateTime.now().toString("HH:mm");
 	}
@@ -145,7 +151,14 @@ public class DateUtils {
 	 * @return
 	 */
 	public static int getTradeDays(String startDate, String endDate) {
-		//TODO: 未完成
-		return 0;
+		StockCacheService cacheService = SpringUtils.getBean(StockCacheService.BEAN_NAME, StockCacheService.class);
+		int count = 0;
+		while(startDate.compareTo(endDate) <= 0) {
+			if(cacheService.isTradeDate(startDate)) {
+				count++;
+			}
+			startDate = getNDate(startDate, 1);
+		}
+		return count;
 	}
 }
