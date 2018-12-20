@@ -38,7 +38,7 @@ public class EndTimeSettlementTask {
 		log.info("开始日终清算");
 
 		log.info("1.开始修改清算状态");
-		commonTradeService.updateSysConfig(SystemConfig.SETTLE_FLAG, "off");
+		commonTradeService.updateSysConfig(SystemConfig.SETTLE_FLAG, "on");
 		log.info("1.结束修改清算状态");
 
 		log.info("2.开始更新行情");

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seiyaya.stock.settlement.mapper.SettleMapper">
+	
+	<resultMap type="AssetsCompare" id="assetsCompareBean">
+		<result property="accountId"  column="account_id"/>
+        <result property="marketId"  column="market_id"/>
+        <result property="stockCode"  column="stock_code"/>
+        <result property="totalQty"  column="total_qty"/>
+        <result property="freezedBalance"  column="freezed_balance"/>
+        <result property="currentBalance"  column="current_balance"/>
+	</resultMap>
+	
+	<!-- 更新股票现价 -->
+	<update id="updateStockInfo" parameterType="java.util.List">
+		<foreach collection="list" separator=";" item="cus">
+			update t_sim_stock set now_price = #{cus.now_price} where stock_code = #{cus.stock_code} and market_id = #{cus.market_id}
+		</foreach>
+	</update>
+	
+	<!-- 处理委托单为废单 -->
+	<update id="updateOrder">
+		update t_sim_today_order set trade_status = #{trade_status} where deal_flag = #{deal_flag}
+	</update>
+	
+	<!--归还冻结资金  -->
+	<update id="updateAccount">
+		update t_sim_account set current_balance = current_balance+freezed_balance,freezed_balance = 0
+	</update>
+	
+	<!-- 归还冻结持仓 -->
+	<update id="updateHoldStock">
+		update t_sim_hold_stock set current_qty = total_qty
+	</update>
+	
+	<select id="queryAccountList" resultType="assetsCompareBean">
+		select t.account_id,t.current_balance,t.freezed_balance,t1.stock_code,t1.market_id,t1.total_qty from t_sim_account t
+		left join t_sim_hold_stock t1
+		 order by t.account_id asc
+	</select>
+	
+	<!-- 更新账户资产信息 -->
+	<update id="updateAccountAssets" parameterType="java.util.List">
+		<foreach collection="list" separator=";" item="cus">
+			update t_sim_account set total_assets = #{cus.totalAssets},total_market = #{cus.totalMarket} where account_id = #{cus.accountId}
+		</foreach>
+	</update>
+	
+	<!-- 迁移历史成交 -->
+	<insert id="addHistBargain">
+		insert into t_sim_hist_bargain
+		 select * from t_sim_bargain
+	</insert>
+	
+	<!-- 删除当日成交 -->
+	<delete id="delBargain">
+		delete from t_sim_bargain
+	</delete>
+	
+	<!-- 迁移历史委托 -->
+	<insert id="addHistOrder">
+		insert into t_sim_hist_order
+			select * from t_sim_order
+	</insert>
+	
+	<!-- 删除当日委托 -->
+	<delete id="delOrder">
+		delete from t_sim_order
+	</delete>
+	
+	<!-- 删除当日历史账户 -->
+	<delete id="delHistAccount" parameterType="hashmap">
+		delete from t_sim_hist_account where backup_date = #{current_date}
+	</delete>
+	
+	<!-- 备份历史账户 -->
+	<insert id="addHistAccount" parameterType="hashmap">
+		insert into t_sim_hist_account 
+			select account_id,money_id,current_balance,freezed_balance,total_assets,total_market,'${current_date}' from t_sim_account
+	</insert>
+	
+	<!-- 删除历史持仓 -->
+	<delete id="delHistHoldStock" parameterType="hashmap">
+		delete from t_sim_hist_hold_stock where backup_date = #{current_date}
+	</delete>
+	
+	<!-- 备份历史持仓 -->
+	<insert id="addHistAccount" parameterType="hashmap">
+		insert into t_sim_hist_account 
+			select account_id,money_id,current_balance,freezed_balance,total_assets,total_market,'${current_date}' from t_sim_account
+	</insert>
+	
+	<delete id="delHistStockInfo">
+		delete from t_sim_hist_stock where  trade_date = #{current_date}
+	</delete>
+	
+	<insert id="addHistStockInfo">
+		insert into t_sim_hist_stock
+		 select * from t_sim_stock
+	</insert>
+</mapper>
