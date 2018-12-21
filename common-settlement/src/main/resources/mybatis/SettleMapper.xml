@@ -98,4 +98,33 @@
 		insert into t_sim_hist_stock
 		 select * from t_sim_stock
 	</insert>
+	
+	<select id="queryBonus" parameterType="string" resultType="bonusBean">
+		select t.hold_id,t.stock_code,t.market_id,t.hold_price,t.cost_price,t.total_qty,t1.rate,t1.type from t_sim_hold_stock t
+			join t_sim_bonus t1 on t.stock_code = t1.stock_code and t.market_id = t1.market_id
+			where t1.bonus_date = #{today}
+	</select>
+	
+	<update id="updateAccount" parameterType="account">
+		<foreach collection="list" separator=";" item="cus">
+			update t_sim_account set current_balance = current_balance + #{cus.currentBalance} where account_id = #{cus.accountId}
+		</foreach>
+	</update>
+	
+	<update id="updateHoldStock" parameterType="holdstock">
+		<foreach collection="list" separator=";" item="cus">
+			update t_sim_hold_stock set total_qty = #{cus.totalQty}
+			,cost_price = #{cus.costPrice}
+			,hold_price = #{cus.holdPrice}
+			 where hold_id = #{cus.holdId}
+		</foreach>
+	</update>
+	
+	<insert id="addBargain" parameterType="bargain">
+		
+	</insert>
+	
+	<update id="updateBonus">
+		update t_sim_bonus set is_execute = #{status} where bonus_date = #{today}
+	</update>
 </mapper>

@@ -8,17 +8,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.github.pagehelper.PageHelper;
 import com.seiyaya.common.bean.Account;
+import com.seiyaya.common.bean.Bargain;
 import com.seiyaya.common.bean.DBPage;
 import com.seiyaya.common.bean.DBParam;
 import com.seiyaya.common.bean.EnumValue;
+import com.seiyaya.common.bean.HoldStock;
 import com.seiyaya.common.bean.Stock;
+import com.seiyaya.common.utils.CollectionUtils;
 import com.seiyaya.common.utils.DateUtils;
 import com.seiyaya.stock.service.StockCacheService;
 import com.seiyaya.stock.settlement.bean.AssetsCompare;
+import com.seiyaya.stock.settlement.bean.Bonus;
 import com.seiyaya.stock.settlement.mapper.SettleMapper;
 import com.seiyaya.stock.settlement.service.SettlementService;
 
@@ -33,7 +36,6 @@ public class SettlementServiceImpl implements SettlementService {
 	
 	@Autowired
 	private SettleMapper settleMapper;
-	
 	
 	@Override
 	public void updateStcokNowPrice() {
@@ -71,7 +73,7 @@ public class SettlementServiceImpl implements SettlementService {
 			log.info("计算的范围{}--->{}",startId,endId);
 			
 			Map<Integer,Map<String,Double>> marketTmp = new HashMap<>();
-			if(!CollectionUtils.isEmpty(accountList)) {
+			if(CollectionUtils.isNotEmpty(accountList)) {
 				for(AssetsCompare assets : accountList) {
 					double tmpMarket = 0;
 					int accountId = assets.getAccountId();
@@ -153,13 +155,66 @@ public class SettlementServiceImpl implements SettlementService {
 	@Override
 	public void dividendStock() {
 		/**
-		 * 1.添加今日分红成交
-		 * 2.添加今日送股成交
-		 * 3.更新分红导致的账户可用增加
-		 * 4.更新送股导致的账户持仓增加，以及成本价
-		 * 5.更新分红导致的成本价降低
-		 * 6.更新最后一次执行该任务的日期
+		 * 1.查询当日分红送股记录
+		 * 2.添加成交记录
+		 * 3.添加账户变更
+		 * 4.添加持仓、成本价变更
+		 * 5.更新分红送股的状态
 		 */
+		String today = DateUtils.formatNowDate();
+		List<Bonus> list = settleMapper.queryBonus(today);
+		List<Account> accountList = new ArrayList<>();
+		List<HoldStock> holdStockList = new ArrayList<>(list.size());
+		List<Bargain> bargainList = new ArrayList<>();
+		if(CollectionUtils.isNotEmpty(list)) {
+			list.forEach((bonus) -> {
+				double rate = bonus.getRate();
+				HoldStock holdStock = new HoldStock();
+				holdStock.setStockCode(bonus.getStockCode());
+				holdStock.setMarketId(bonus.getMarketId());
+				Stock stock = stockCacheService.getStockByKey(bonus.getMarketId()+bonus.getStockCode());
+				Bargain bargain = new Bargain();
+				bargain.setAccountId(bonus.getAccountId());
+				bargain.setStockCode(bonus.getStockCode());
+				bargain.setMarketId(bonus.getMarketId());
+				bargain.setExecDate(DateUtils.formatNowDate());
+				bargain.setExecTime(DateUtils.formatNowTime());
+				bargain.setExecPrice(0);
+				bargain.setHoldId(bonus.getHoldId());
+				bargain.setStockName(stock.getStockName());
+				bargain.setOrderId(0);
+				if(bonus.isBonus()) {
+					//分红  添加余额,降低成本价
+					holdStock.setCostPrice(bonus.getCostPrice()-rate);
+					holdStock.setHoldPrice(bonus.getHoldPrice()-rate);
+					Account account = new Account();
+					double balance = bonus.getTotalQty()*rate;
+					account.setCurrentBalance(balance);
+					account.setAccountId(bonus.getAccountId());
+					accountList.add(account);
+					bargain.setExecQty(0);
+					bargain.setBargainBalance(balance);
+					bargain.setTradeType(EnumValue.TRADE_TYPE_2);
+				}else {
+					//送股	增加股份，成本价降低
+					holdStock.setCostPrice(bonus.getCostPrice()/(1+rate));
+					holdStock.setHoldPrice(bonus.getHoldPrice()/(1+rate));
+					int addQty = (int) (bonus.getTotalQty()*(1+rate));
+					holdStock.setTotalQty(addQty);
+					bargain.setExecQty(addQty);
+					bargain.setBargainBalance(0);
+					bargain.setTradeType(EnumValue.TRADE_TYPE_3);
+				}
+				holdStockList.add(holdStock);
+				bargainList.add(bargain);
+			});
+			settleMapper.updateAccount(accountList);
+			settleMapper.updateHoldStock(holdStockList);
+			settleMapper.addBargain(bargainList);
+			settleMapper.updateBonus(today,EnumValue.STATUS_SUCCESS);
+		}else {
+			log.info("当日没有分红送股记录");
+		}
 	}
 
 }
