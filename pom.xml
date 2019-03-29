@@ -10,7 +10,7 @@
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starters</artifactId>
+		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.4.0.RELEASE</version>
 	</parent>
 
@@ -23,6 +23,8 @@
 		<fastjson.version>1.2.51</fastjson.version>
 		<jsoup.version>1.8.3</jsoup.version>
 		<mybatis.pagehelper.version>4.1.4</mybatis.pagehelper.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 
@@ -68,28 +70,19 @@
 				<artifactId>commons-io</artifactId>
 				<version>${commons.io.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.puppycrawl.tools</groupId>
+				<artifactId>checkstyle</artifactId>
+				<version>6.18</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework</groupId>
-						<artifactId>springloaded</artifactId>
-						<version>1.2.5.RELEASE</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
 	<modules>
 		<module>../common-component</module>
 		<module>../common-trade</module>
 		<module>../common-engine</module>
 		<module>../common-settlement</module>
+		<module>../common-indicator</module>
 	</modules>
 </project>
